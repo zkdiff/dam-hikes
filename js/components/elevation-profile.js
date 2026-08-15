@@ -80,6 +80,19 @@ export class ElevationProfile {
     }).join('');
 
     container.innerHTML = `
+      <!-- Exact Original Previous & Next Navigation Component (Positioned Above Elevation Profile) -->
+      <div class="trail-elevation-nav">
+        <button type="button" class="btn-step-arrow" id="btn-elev-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on the trail">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <p class="trail-step-count">
+          ${total > 0 ? `${index + 1} / ${total} on trail` : '0 on trail'}
+        </p>
+        <button type="button" class="btn-step-arrow" id="btn-elev-next" ${index >= total - 1 ? 'disabled' : ''} aria-label="Next update, south on the trail">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
       <!-- Elevation Profile Header -->
       <div class="elevation-profile-header">
         <span class="elevation-title-label">Elevation</span>
@@ -129,19 +142,6 @@ export class ElevationProfile {
       <div class="elevation-axis-labels">
         <span>Cascade Locks</span>
         <span>Campo</span>
-      </div>
-
-      <!-- Exact Original Previous & Next Navigation Component -->
-      <div class="trail-elevation-nav">
-        <button type="button" class="btn-step-arrow" id="btn-elev-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on the trail">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <p class="trail-step-count">
-          ${total > 0 ? `${index + 1} / ${total} on trail` : '0 on trail'}
-        </p>
-        <button type="button" class="btn-step-arrow" id="btn-elev-next" ${index >= total - 1 ? 'disabled' : ''} aria-label="Next update, south on the trail">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
       </div>
     `;
 
