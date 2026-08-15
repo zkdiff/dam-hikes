@@ -280,8 +280,8 @@ export class TrailMap {
     if (isLandscape) {
       const dockW = bottomDock ? bottomDock.getBoundingClientRect().width : 440;
       pad = {
-        paddingTopLeft: [20, 108],
-        paddingBottomRight: [Math.max(380, dockW + 28), 24],
+        paddingTopLeft: [Math.max(380, dockW + 28), 108],
+        paddingBottomRight: [24, 24],
         animate: true
       };
     } else {

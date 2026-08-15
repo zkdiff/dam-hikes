@@ -1130,13 +1130,13 @@ button:disabled {
   border-radius: var(--radius-sm);
 }
 
-/* --- Landscape & Desktop Side-Dock Media Query --- */
+/* --- Landscape & Desktop Side-Dock Media Query (Left Side) --- */
 @media ((min-width: 1024px) and (orientation: landscape)), (min-width: 1100px) {
   .bottom-dock-container {
     top: 76px;
     bottom: 20px;
-    right: 20px;
-    left: auto;
+    left: 20px;
+    right: auto;
     width: 440px;
     max-width: 440px;
     height: auto;
@@ -1181,13 +1181,12 @@ button:disabled {
   }
 
   .floating-map-controls {
-    right: 476px;
-    top: 76px;
-    transition: right 0.2s ease;
+    right: 14px;
+    top: 96px;
   }
 
   .floating-header {
-    max-width: calc(100vw - 480px);
-    margin: 0;
+    max-width: 100%;
+    margin: 0 auto;
   }
 }
