@@ -1,7 +1,10 @@
 /**
- * DAM HIKES - 2-Stage Authoring Screen
- * Stage 1: Dedicated Pre-Selection Screen to choose Update Type (Story, Minimalist, Field Log)
- * Stage 2: Exclusively Keyed Authoring Screen for the chosen type
+ * DAM HIKES - 2-Stage Authoring Screen for 5 Update Types:
+ * 1. Statistics
+ * 2. Title + Words
+ * 3. Title + Voice
+ * 4. Scripture Reading
+ * 5. Kirtan Streaming
  */
 
 import { PCT_WAYPOINTS } from '../data/pct-route.js';
@@ -36,7 +39,7 @@ export class AuthorScreen {
     this.containerId = containerId;
     this.busy = false;
     this.step = 'choose_type'; // 'choose_type' | 'form'
-    this.currentFormat = 'story'; // 'story' | 'minimal' | 'fieldlog'
+    this.currentType = 'words'; // 'statistics' | 'words' | 'voice' | 'scripture' | 'kirtan'
     this.attachedPhotos = [];
     this.formData = {};
   }
@@ -56,7 +59,7 @@ export class AuthorScreen {
       const existing = store.entries.find(e => e.id === editingId);
       if (existing) {
         this.step = 'form';
-        this.currentFormat = existing.layoutStyle || 'story';
+        this.currentType = existing.type || (existing.scripture ? 'scripture' : existing.kirtan ? 'kirtan' : existing.voice ? 'voice' : existing.layoutStyle === 'fieldlog' ? 'statistics' : 'words');
         this.attachedPhotos = [...(existing.photos || [])];
         this.formData = {
           date: existing.date,
@@ -66,15 +69,17 @@ export class AuthorScreen {
           quote: existing.quote || '',
           body: existing.body || '',
           category: existing.category || 'reflection',
-          metrics: { ...(existing.metrics || {}) }
+          metrics: { ...(existing.metrics || {}) },
+          voice: { ...(existing.voice || {}) },
+          scripture: { ...(existing.scripture || {}) },
+          kirtan: { ...(existing.kirtan || {}) }
         };
         return;
       }
     }
 
-    // New Entry starts at Stage 1: Choose Type
     this.step = 'choose_type';
-    this.currentFormat = 'story';
+    this.currentType = 'words';
     this.attachedPhotos = [];
     this.formData = {
       date: new Date().toISOString().split('T')[0],
@@ -85,12 +90,34 @@ export class AuthorScreen {
       body: '',
       category: 'reflection',
       metrics: {
-        tempF: 68,
-        condition: 'Clear',
-        waterSource: '',
-        packWeightLbs: 26.0,
-        dayMileage: 20.0,
+        tempF: 62,
+        condition: 'Sunny',
+        waterSource: 'Stream',
+        packWeightLbs: 26.5,
+        dayMileage: 22.0,
+        ascentFt: 3400,
+        descentFt: 2100,
+        movingTime: '6h 30m',
         gearNotes: ''
+      },
+      voice: {
+        audioSrc: 'ambient-voice-recording',
+        duration: '02:30',
+        transcript: ''
+      },
+      scripture: {
+        source: 'Bhagavad Gita',
+        citation: 'Chapter 6, Verse 25',
+        transliteration: '',
+        translation: '',
+        purport: ''
+      },
+      kirtan: {
+        streamUrl: 'kirtan-live-stream',
+        artist: 'DAM & Trail Sangha',
+        mantra: 'Hare Krishna Hare Krishna Krishna Krishna Hare Hare\nHare Rama Hare Rama Rama Rama Hare Hare',
+        translation: '',
+        ragaOrMood: 'Evening Meditation'
       }
     };
   }
@@ -111,64 +138,102 @@ export class AuthorScreen {
       <div class="compose-type-selection-screen" style="padding-bottom: 24px;">
         <div class="type-selection-header">
           <h3 class="type-selection-title">Choose Update Type</h3>
-          <p class="type-selection-subtitle">Select the format that best fits what you are recording today:</p>
+          <p class="type-selection-subtitle">What kind of moment are you recording on the trail today?</p>
         </div>
 
         <div class="type-cards-stack">
-          <!-- Option 1: Rich Story -->
-          <button type="button" class="btn-type-big-card" data-format="story">
-            <div class="type-card-top">
-              <span class="type-big-icon">📖</span>
-              <div class="type-card-headings">
-                <div class="type-main-title">Rich Story</div>
-                <div class="type-sub-title">Long-form narrative & photo gallery</div>
-              </div>
-            </div>
-            <p class="type-card-description">
-              For major milestones, town arrivals, trail encounters, and memorable days with a story to tell. Includes a multi-photo gallery, pull quote, and full journal prose.
-            </p>
-            <div class="type-card-tags">
-              <span class="type-tag">Multi-Photo Gallery</span>
-              <span class="type-tag">Pull Quotes</span>
-              <span class="type-tag">Long-Form Story</span>
-            </div>
-          </button>
-
-          <!-- Option 2: Minimalist Reflection -->
-          <button type="button" class="btn-type-big-card" data-format="minimal">
-            <div class="type-card-top">
-              <span class="type-big-icon">🕊️</span>
-              <div class="type-card-headings">
-                <div class="type-main-title">Minimalist Reflection</div>
-                <div class="type-sub-title">Single hero photo & centerpiece quote</div>
-              </div>
-            </div>
-            <p class="type-card-description">
-              For quiet summits, sunsets, and poignant trail thoughts. Strips away the data clutter to focus purely on one curated photograph and an evocative centerpiece line.
-            </p>
-            <div class="type-card-tags">
-              <span class="type-tag">Hero Photograph</span>
-              <span class="type-tag">Centerpiece Quote</span>
-              <span class="type-tag">Poetic Reflection</span>
-            </div>
-          </button>
-
-          <!-- Option 3: Field Log -->
-          <button type="button" class="btn-type-big-card" data-format="fieldlog">
+          <!-- 1. Statistics -->
+          <button type="button" class="btn-type-big-card" data-type="statistics">
             <div class="type-card-top">
               <span class="type-big-icon">📊</span>
               <div class="type-card-headings">
-                <div class="type-main-title">Field Log</div>
-                <div class="type-sub-title">Data-first conditions, water & resupply</div>
+                <div class="type-main-title">Statistics</div>
+                <div class="type-sub-title">Trail intelligence, splits, elevation & water</div>
               </div>
             </div>
             <p class="type-card-description">
-              For practical trail intelligence: 4-cell weather/temp grid, water flow source, pack weight carry, daily mileage, and resupply notes.
+              Data-first log: 4-cell conditions grid (temperature, water flow, pack weight, mileage), ascent/descent elevation splits, and resupply notes.
             </p>
             <div class="type-card-tags">
-              <span class="type-tag">4-Cell Conditions Grid</span>
+              <span class="type-tag">Conditions Grid</span>
+              <span class="type-tag">Elevation Splits</span>
               <span class="type-tag">Water Status</span>
-              <span class="type-tag">Resupply & Gear</span>
+            </div>
+          </button>
+
+          <!-- 2. Title + Words -->
+          <button type="button" class="btn-type-big-card" data-type="words">
+            <div class="type-card-top">
+              <span class="type-big-icon">✍️</span>
+              <div class="type-card-headings">
+                <div class="type-main-title">Title + Words</div>
+                <div class="type-sub-title">Literary essay, pull quote & reflection</div>
+              </div>
+            </div>
+            <p class="type-card-description">
+              Pure literary journal entry: elegant display serif typography, epigraph pull quote, multi-paragraph markdown narrative, and single hero photograph.
+            </p>
+            <div class="type-card-tags">
+              <span class="type-tag">Hero Photo</span>
+              <span class="type-tag">Pull Quotes</span>
+              <span class="type-tag">Editorial Prose</span>
+            </div>
+          </button>
+
+          <!-- 3. Title + Voice -->
+          <button type="button" class="btn-type-big-card" data-type="voice">
+            <div class="type-card-top">
+              <span class="type-big-icon">🎙️</span>
+              <div class="type-card-headings">
+                <div class="type-main-title">Title + Voice</div>
+                <div class="type-sub-title">Audio field recording & spoken transcript</div>
+              </div>
+            </div>
+            <p class="type-card-description">
+              Spoken wilderness dispatches: interactive SVG audio waveform player, duration counter, and transcribed spoken word field notes.
+            </p>
+            <div class="type-card-tags">
+              <span class="type-tag">SVG Waveform Player</span>
+              <span class="type-tag">Voice Memo</span>
+              <span class="type-tag">Transcript</span>
+            </div>
+          </button>
+
+          <!-- 4. Scripture Reading -->
+          <button type="button" class="btn-type-big-card" data-type="scripture">
+            <div class="type-card-top">
+              <span class="type-big-icon">📜</span>
+              <div class="type-card-headings">
+                <div class="type-main-title">Scripture Reading</div>
+                <div class="type-sub-title">Sacred verse, transliteration & realization</div>
+              </div>
+            </div>
+            <p class="type-card-description">
+              Sacred contemplative texts: citation reference, Sanskrit/source transliteration, highlighted English translation, and trail-side realization purport.
+            </p>
+            <div class="type-card-tags">
+              <span class="type-tag">Sanskrit Transliteration</span>
+              <span class="type-tag">Translation</span>
+              <span class="type-tag">Trail Purport</span>
+            </div>
+          </button>
+
+          <!-- 5. Kirtan Streaming -->
+          <button type="button" class="btn-type-big-card" data-type="kirtan">
+            <div class="type-card-top">
+              <span class="type-big-icon">📿</span>
+              <div class="type-card-headings">
+                <div class="type-main-title">Kirtan Streaming</div>
+                <div class="type-sub-title">Devotional chant stream, mantra lyrics & raga</div>
+              </div>
+            </div>
+            <p class="type-card-description">
+              Devotional music & meditative soundscapes: audio stream player, multi-line Sanskrit mantra chant lyrics, meaning translation, and raga mood notes.
+            </p>
+            <div class="type-card-tags">
+              <span class="type-tag">Stream Player</span>
+              <span class="type-tag">Mantra Lyrics</span>
+              <span class="type-tag">Raga Notes</span>
             </div>
           </button>
         </div>
@@ -177,14 +242,7 @@ export class AuthorScreen {
 
     container.querySelectorAll('.btn-type-big-card').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.currentFormat = btn.dataset.format;
-        if (this.currentFormat === 'minimal') {
-          this.formData.category = 'reflection';
-        } else if (this.currentFormat === 'fieldlog') {
-          this.formData.category = 'resupply';
-        } else {
-          this.formData.category = 'milestone';
-        }
+        this.currentType = btn.dataset.type;
         this.step = 'form';
         this.render();
       });
@@ -203,33 +261,100 @@ export class AuthorScreen {
     const quote = this.formData.quote || '';
     const body = this.formData.body || '';
     const category = this.formData.category || 'reflection';
-    const metrics = this.formData.metrics || {};
+    const m = this.formData.metrics || {};
+    const v = this.formData.voice || {};
+    const s = this.formData.scripture || {};
+    const k = this.formData.kirtan || {};
 
-    let formatSpecificFormHtml = '';
+    let formTypeHtml = '';
 
-    if (this.currentFormat === 'minimal') {
-      // --- 🕊️ MINIMALIST REFLECTION FORM ---
-      formatSpecificFormHtml = `
+    // --- FORM 1: 📊 STATISTICS ---
+    if (this.currentType === 'statistics') {
+      formTypeHtml = `
         <div class="form-field">
-          <label for="compose-quote"><strong>Centerpiece Pull Quote (The Core Thought)</strong></label>
-          <textarea id="compose-quote" name="quote" rows="2" required placeholder="e.g. Hood is the first mountain I have to walk around. After that the trail is a long green hallway..." style="font-family: var(--font-display); font-size: 15px; font-style: italic;">${quote}</textarea>
+          <label for="compose-title">Statistics Title / Log Name</label>
+          <input id="compose-title" required placeholder="e.g. Forester Pass Zenith: Highest Point on PCT" maxlength="80" value="${title}" />
+        </div>
+
+        <div style="background: rgba(18, 20, 16, 0.7); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-trail); font-weight: 700; margin-bottom: 8px;">📊 4-Cell Conditions Grid</p>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="compose-temp">Temp (°F)</label>
+              <input id="compose-temp" type="number" value="${m.tempF || 52}" required />
+            </div>
+            <div class="form-field">
+              <label for="compose-condition">Sky / Wind Condition</label>
+              <input id="compose-condition" placeholder="e.g. Freezing Alpine Gale" value="${m.condition || ''}" required />
+            </div>
+          </div>
+          <div class="form-grid-2" style="margin-top: 8px;">
+            <div class="form-field">
+              <label for="compose-water">Water Source Flow</label>
+              <input id="compose-water" placeholder="e.g. Bubbling Spring" value="${m.waterSource || ''}" required />
+            </div>
+            <div class="form-field">
+              <label for="compose-pack">Pack Weight (lbs)</label>
+              <input id="compose-pack" type="number" step="0.5" value="${m.packWeightLbs || 26.5}" required />
+            </div>
+          </div>
+          <div class="form-grid-2" style="margin-top: 8px;">
+            <div class="form-field">
+              <label for="compose-day-mileage">Daily Mileage (mi)</label>
+              <input id="compose-day-mileage" type="number" step="0.1" value="${m.dayMileage || 24.5}" required />
+            </div>
+            <div class="form-field">
+              <label for="compose-moving-time">Moving Time</label>
+              <input id="compose-moving-time" placeholder="e.g. 7h 42m" value="${m.movingTime || '7h 15m'}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label for="compose-ascent">Total Ascent (+ft)</label>
+            <input id="compose-ascent" type="number" value="${m.ascentFt || 3850}" />
+          </div>
+          <div class="form-field">
+            <label for="compose-descent">Total Descent (-ft)</label>
+            <input id="compose-descent" type="number" value="${m.descentFt || 2150}" />
+          </div>
         </div>
 
         <div class="form-field">
-          <label for="compose-title">Title / Reflection Title</label>
-          <input id="compose-title" name="title" required placeholder="e.g. Looking south through the green hallway" maxlength="80" value="${title}" />
+          <label for="compose-gear-notes"><strong>⚙️ Gear & Resupply Notes</strong></label>
+          <input id="compose-gear-notes" placeholder="e.g. Microspikes used on north chute. 5 days food carry." value="${m.gearNotes || ''}" />
         </div>
 
         <div class="form-field">
-          <label for="compose-body">Contemplative Reflection Narrative</label>
-          <textarea id="compose-body" name="body" rows="5" required placeholder="Write your quiet reflection, thoughts, or observations on the trail...">${body}</textarea>
+          <label for="compose-body">Field Observations & Conditions</label>
+          <textarea id="compose-body" rows="4" placeholder="Log trail surface, snowpack, terrain notes...">${body}</textarea>
+        </div>
+      `;
+
+    // --- FORM 2: ✍️ TITLE + WORDS ---
+    } else if (this.currentType === 'words') {
+      formTypeHtml = `
+        <div class="form-field">
+          <label for="compose-title">Story / Reflection Title</label>
+          <input id="compose-title" required placeholder="e.g. Looking South Through the Green Hallway" maxlength="80" value="${title}" />
         </div>
 
         <div class="form-field">
-          <label>Curated Single Hero Photograph</label>
+          <label for="compose-quote">Lead Pull Quote / Epigraph</label>
+          <textarea id="compose-quote" rows="2" placeholder="e.g. Hood is the first mountain I have to walk around..." style="font-family: var(--font-display); font-size: 15px; font-style: italic;">${quote}</textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="compose-body">Journal Prose Narrative</label>
+          <textarea id="compose-body" rows="6" required placeholder="Write your full long-form narrative or poem...">${body}</textarea>
+        </div>
+
+        <div class="form-field">
+          <label>Curated Hero Photograph</label>
           <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;">
+            <button type="button" class="btn-preset-thumb" data-src="photos/bridge-gods.jpg">Bridge</button>
             <button type="button" class="btn-preset-thumb" data-src="photos/mt-hood.jpg">Mt Hood</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/gorge-trail.jpg">Gorge</button>
             <button type="button" class="btn-preset-thumb" data-src="photos/canopy.jpg">Forest</button>
             <button type="button" class="btn-preset-thumb" data-src="photos/river-dusk.jpg">River</button>
             <button type="button" class="btn-preset-thumb" data-src="photos/hiker-back.jpg">Hiker</button>
@@ -241,126 +366,122 @@ export class AuthorScreen {
         </div>
       `;
 
-    } else if (this.currentFormat === 'fieldlog') {
-      // --- 📊 FIELD LOG FORM ---
-      formatSpecificFormHtml = `
+    // --- FORM 3: 🎙️ TITLE + VOICE ---
+    } else if (this.currentType === 'voice') {
+      formTypeHtml = `
         <div class="form-field">
-          <label for="compose-title">Field Log Title</label>
-          <input id="compose-title" name="title" required placeholder="e.g. Timberline Waffles & Resupply Push" maxlength="80" value="${title}" />
+          <label for="compose-title">Voice Dispatch Title</label>
+          <input id="compose-title" required placeholder="e.g. Wind Over the Caldera Rim at Dusk" maxlength="80" value="${title}" />
         </div>
 
-        <!-- 4-Cell Field Metrics Grid Inputs -->
-        <div style="background: rgba(18, 20, 16, 0.7); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
-          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-trail); font-weight: 700; margin-bottom: 8px;">📊 4-Cell Conditions Grid</p>
-          <div class="form-grid-2">
-            <div class="form-field">
-              <label for="compose-temp">Temp (°F)</label>
-              <input id="compose-temp" type="number" value="${metrics.tempF || 52}" required />
-            </div>
-            <div class="form-field">
-              <label for="compose-condition">Sky / Wind Condition</label>
-              <input id="compose-condition" placeholder="e.g. Alpine Morning Sun" value="${metrics.condition || ''}" required />
-            </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label for="compose-voice-duration">Recording Duration</label>
+            <input id="compose-voice-duration" placeholder="e.g. 02:44" value="${v.duration || '02:30'}" required />
           </div>
-          <div class="form-grid-2" style="margin-top: 8px;">
-            <div class="form-field">
-              <label for="compose-water">Water Source & Reliability</label>
-              <input id="compose-water" placeholder="e.g. Lodge tap + Salmon River" value="${metrics.waterSource || ''}" required />
-            </div>
-            <div class="form-field">
-              <label for="compose-pack">Pack Weight (lbs)</label>
-              <input id="compose-pack" type="number" step="0.5" value="${metrics.packWeightLbs || 26.0}" required />
-            </div>
-          </div>
-          <div class="form-field" style="margin-top: 8px;">
-            <label for="compose-day-mileage">Daily Mileage (mi)</label>
-            <input id="compose-day-mileage" type="number" step="0.1" value="${metrics.dayMileage || 24.5}" placeholder="e.g. 24.5" />
+          <div class="form-field">
+            <label for="compose-voice-src">Audio Source / Preset</label>
+            <input id="compose-voice-src" placeholder="ambient-ridge-wind" value="${v.audioSrc || 'ambient-voice-recording'}" />
           </div>
         </div>
 
         <div class="form-field">
-          <label for="compose-gear-notes"><strong>⚙️ Resupply & Gear Notes</strong></label>
-          <input id="compose-gear-notes" placeholder="e.g. Resupplied 5 days oats, tuna packets, tortillas, electrolyte tabs" value="${metrics.gearNotes || ''}" />
+          <label for="compose-voice-transcript"><strong>🎙️ Spoken Word Transcript & Notes</strong></label>
+          <textarea id="compose-voice-transcript" rows="4" required placeholder="Transcribe your spoken thoughts, trail sounds, ambient conditions...">${v.transcript || body}</textarea>
         </div>
 
         <div class="form-field">
-          <label for="compose-body">Trail Observations & Field Log</label>
-          <textarea id="compose-body" name="body" rows="4" required placeholder="Log trail surface conditions, water carries, elevation climbs...">${body}</textarea>
-        </div>
-
-        <div class="form-field">
-          <label>Field Photos</label>
+          <label>Ambient Scene Photo</label>
           <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;">
-            <button type="button" class="btn-preset-thumb" data-src="photos/pack-table.jpg">Pack</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/gear-spread.jpg">Gear</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/trail-post.jpg">Post</button>
+            <button type="button" class="btn-preset-thumb" data-src="photos/gorge-trail.jpg">Gorge</button>
+            <button type="button" class="btn-preset-thumb" data-src="photos/canopy.jpg">Canopy</button>
+            <button type="button" class="btn-preset-thumb" data-src="photos/river-dusk.jpg">River</button>
           </div>
-          <input id="compose-photos" name="photos" type="file" accept="image/*" multiple />
-          <div id="compose-photo-preview-list" style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
+          <input id="compose-photos" name="photos" type="file" accept="image/*" />
+          <div id="compose-photo-preview-list" style="display: flex; gap: 6px; margin-top: 6px;">
             ${this.renderPhotoPreviews()}
           </div>
         </div>
       `;
 
-    } else {
-      // --- 📖 RICH STORY FORM ---
-      formatSpecificFormHtml = `
+    // --- FORM 4: 📜 SCRIPTURE READING ---
+    } else if (this.currentType === 'scripture') {
+      formTypeHtml = `
         <div class="form-field">
-          <label for="compose-title">Story Title</label>
-          <input id="compose-title" name="title" required placeholder="What happened today?" maxlength="80" value="${title}" />
+          <label for="compose-title">Contemplation / Reading Title</label>
+          <input id="compose-title" required placeholder="e.g. Trance by Intelligence Under Mount Jefferson" maxlength="80" value="${title}" />
         </div>
 
-        <div class="form-field">
-          <label for="compose-quote">Lead / Pull Quote (Optional)</label>
-          <input id="compose-quote" name="quote" placeholder="e.g. Washington on one bank, Oregon on the other..." value="${quote}" />
-        </div>
-
-        <div class="form-field">
-          <label for="compose-body">Journal Narrative Story</label>
-          <textarea id="compose-body" name="body" rows="6" required placeholder="Write your full long-form story...">${body}</textarea>
-        </div>
-
-        <div class="form-field">
-          <label>Photo Gallery (Attach multiple images)</label>
-          <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;">
-            <button type="button" class="btn-preset-thumb" data-src="photos/bridge-gods.jpg">Bridge</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/mt-hood.jpg">Mt Hood</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/canopy.jpg">Forest</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/river-dusk.jpg">River</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/town-waterfront.jpg">Town</button>
-            <button type="button" class="btn-preset-thumb" data-src="photos/hiker-back.jpg">Hiker</button>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label for="compose-scripture-source">Scripture / Tradition</label>
+            <input id="compose-scripture-source" placeholder="e.g. Bhagavad Gita" value="${s.source || 'Bhagavad Gita'}" required />
           </div>
-          <input id="compose-photos" name="photos" type="file" accept="image/*" multiple />
-          <div id="compose-photo-preview-list" style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
-            ${this.renderPhotoPreviews()}
+          <div class="form-field">
+            <label for="compose-scripture-citation">Chapter & Verse</label>
+            <input id="compose-scripture-citation" placeholder="e.g. Chapter 6, Verse 25" value="${s.citation || 'Chapter 6, Verse 25'}" required />
           </div>
         </div>
 
-        <details style="background: rgba(18, 20, 16, 0.5); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
-          <summary style="font-size: 12px; font-weight: 600; color: var(--color-muted); cursor: pointer;">Optional Field Conditions (Temp, Water, Pack)</summary>
-          <div class="form-grid-2" style="margin-top: 8px;">
-            <div class="form-field">
-              <label for="compose-temp">Temp (°F)</label>
-              <input id="compose-temp" type="number" value="${metrics.tempF || 68}" />
-            </div>
-            <div class="form-field">
-              <label for="compose-condition">Sky / Wind</label>
-              <input id="compose-condition" placeholder="e.g. Crisp & Warm" value="${metrics.condition || ''}" />
-            </div>
+        <div class="form-field">
+          <label for="compose-scripture-transliteration">Original Verse / Sanskrit Transliteration</label>
+          <textarea id="compose-scripture-transliteration" rows="2" placeholder="e.g. śanaiḥ śanair uparamed buddhyā dhṛti-gṛhītayā..." style="font-family: var(--font-display); font-style: italic;">${s.transliteration || ''}</textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="compose-scripture-translation"><strong>English Translation</strong></label>
+          <textarea id="compose-scripture-translation" rows="3" required placeholder="e.g. Gradually, step by step, one should become situated in trance...">${s.translation || ''}</textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="compose-scripture-purport"><strong>Trail Realization & Purport</strong></label>
+          <textarea id="compose-scripture-purport" rows="4" required placeholder="Reflect on how this verse applies to the trail journey, discipline, and consciousness...">${s.purport || ''}</textarea>
+        </div>
+      `;
+
+    // --- FORM 5: 📿 KIRTAN STREAMING ---
+    } else if (this.currentType === 'kirtan') {
+      formTypeHtml = `
+        <div class="form-field">
+          <label for="compose-title">Kirtan Stream Title</label>
+          <input id="compose-title" required placeholder="e.g. Radhe Govinda & Campfire Japa" maxlength="80" value="${title}" />
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label for="compose-kirtan-artist">Artist / Chanter</label>
+            <input id="compose-kirtan-artist" placeholder="e.g. DAM & Trail Sangha" value="${k.artist || 'DAM & Trail Sangha'}" />
           </div>
-          <div class="form-grid-2" style="margin-top: 8px;">
-            <div class="form-field">
-              <label for="compose-water">Water Source</label>
-              <input id="compose-water" placeholder="e.g. Stream on trail" value="${metrics.waterSource || ''}" />
-            </div>
-            <div class="form-field">
-              <label for="compose-pack">Pack Weight (lbs)</label>
-              <input id="compose-pack" type="number" step="0.5" value="${metrics.packWeightLbs || 26.0}" />
-            </div>
+          <div class="form-field">
+            <label for="compose-kirtan-stream">Stream Audio / Video URL</label>
+            <input id="compose-kirtan-stream" placeholder="kirtan-live-stream" value="${k.streamUrl || 'kirtan-stream-url'}" />
           </div>
-        </details>
+        </div>
+
+        <div class="form-field">
+          <label for="compose-kirtan-mantra"><strong>📿 Sanskrit Mantra Chant Lyrics</strong></label>
+          <textarea id="compose-kirtan-mantra" rows="3" required placeholder="Hare Krishna Hare Krishna Krishna Krishna Hare Hare\nHare Rama Hare Rama Rama Rama Hare Hare" style="font-family: var(--font-mono); font-size: 13px;">${k.mantra || ''}</textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="compose-kirtan-translation">Devotional Meaning / Translation</label>
+          <textarea id="compose-kirtan-translation" rows="2" placeholder="O Lord, please engage me in Your transcendental service...">${k.translation || ''}</textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="compose-kirtan-raga">Setting, Raga & Meditation Mood</label>
+          <input id="compose-kirtan-raga" placeholder="e.g. Bhairavi Evening Meditation · Acoustic drone by running stream" value="${k.ragaOrMood || ''}" />
+        </div>
       `;
     }
+
+    const typeBadges = {
+      statistics: '📊 Statistics Log',
+      words: '✍️ Title + Words',
+      voice: '🎙️ Title + Voice',
+      scripture: '📜 Scripture Reading',
+      kirtan: '📿 Kirtan Streaming'
+    };
 
     container.innerHTML = `
       <form id="compose-trail-form" class="compose-form-stack" style="padding-bottom: 24px;">
@@ -372,11 +493,11 @@ export class AuthorScreen {
             <span>Change Type</span>
           </button>
           <div class="compose-current-badge">
-            ${this.currentFormat === 'minimal' ? '🕊️ Minimalist Reflection' : this.currentFormat === 'fieldlog' ? '📊 Field Log' : '📖 Rich Story'}
+            ${typeBadges[this.currentType] || '✍️ Update'}
           </div>
         </div>
 
-        <!-- Location & Landmark Jump -->
+        <!-- Landmark & Date Selectors -->
         <div class="form-field">
           <label for="compose-landmark-preset">Jump to Milestone / Landmark</label>
           <select id="compose-landmark-preset" style="padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-fg); font-size: 13px;">
@@ -403,7 +524,7 @@ export class AuthorScreen {
         <div class="form-grid-2">
           <div class="form-field">
             <label for="compose-location">Location / Landmark Name</label>
-            <input id="compose-location" name="location" required placeholder="e.g. Timberline Lodge, OR" maxlength="80" value="${location}" />
+            <input id="compose-location" name="location" required placeholder="e.g. Forester Pass Summit, CA" maxlength="80" value="${location}" />
           </div>
           <div class="form-field">
             <label for="compose-category">Category Badge</label>
@@ -418,8 +539,8 @@ export class AuthorScreen {
           </div>
         </div>
 
-        <!-- Format-Specific Tailored Inputs -->
-        ${formatSpecificFormHtml}
+        <!-- Exclusively Keyed Form Inputs -->
+        ${formTypeHtml}
 
         <!-- Submit & Delete Actions -->
         <div style="display: flex; gap: 8px; margin-top: 14px;">
@@ -429,7 +550,7 @@ export class AuthorScreen {
             </button>
           ` : ''}
           <button type="submit" id="btn-submit-update" class="btn-compose-submit" style="flex: 1;">
-            ${isEdit ? 'Save Changes' : `Publish ${this.currentFormat === 'minimal' ? 'Reflection' : this.currentFormat === 'fieldlog' ? 'Field Log' : 'Story'}`}
+            ${isEdit ? 'Save Changes' : `Publish ${typeBadges[this.currentType]}`}
           </button>
         </div>
       </form>
@@ -451,7 +572,7 @@ export class AuthorScreen {
     const form = container.querySelector('#compose-trail-form');
     if (!form) return;
 
-    // Back to Stage 1
+    // Back button to choose different type
     container.querySelector('#btn-back-to-type-choice')?.addEventListener('click', () => {
       this.step = 'choose_type';
       this.render();
@@ -475,11 +596,7 @@ export class AuthorScreen {
           src: btn.dataset.src,
           alt: form.querySelector('#compose-location')?.value || 'Trail photo'
         };
-        if (this.currentFormat === 'minimal') {
-          this.attachedPhotos = [photoObj];
-        } else {
-          this.attachedPhotos.push(photoObj);
-        }
+        this.attachedPhotos = [photoObj];
         const listEl = container.querySelector('#compose-photo-preview-list');
         if (listEl) listEl.innerHTML = this.renderPhotoPreviews();
       });
@@ -488,23 +605,15 @@ export class AuthorScreen {
     // File Input Upload with Compression
     container.querySelector('#compose-photos')?.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files || []).filter(f => f.size > 0);
-      if (this.currentFormat === 'minimal' && files.length > 0) {
+      if (files.length > 0) {
         const compressed = await compressImage(files[0]);
         this.attachedPhotos = [{
           src: compressed,
           alt: form.querySelector('#compose-location')?.value || 'Trail photo'
         }];
-      } else {
-        for (const f of files.slice(0, 4)) {
-          const compressed = await compressImage(f);
-          this.attachedPhotos.push({
-            src: compressed,
-            alt: form.querySelector('#compose-location')?.value || 'Trail photo'
-          });
-        }
+        const listEl = container.querySelector('#compose-photo-preview-list');
+        if (listEl) listEl.innerHTML = this.renderPhotoPreviews();
       }
-      const listEl = container.querySelector('#compose-photo-preview-list');
-      if (listEl) listEl.innerHTML = this.renderPhotoPreviews();
     });
 
     // Remove photo
@@ -540,50 +649,70 @@ export class AuthorScreen {
         const mile = parseFloat(form.querySelector('#compose-mile').value);
         const location = form.querySelector('#compose-location').value;
         const title = form.querySelector('#compose-title').value;
-        const quote = form.querySelector('#compose-quote')?.value || '';
-        const body = form.querySelector('#compose-body').value;
         const category = form.querySelector('#compose-category').value;
-        const layoutStyle = this.currentFormat;
+        const type = this.currentType;
+
+        const body = form.querySelector('#compose-body')?.value || '';
+        const quote = form.querySelector('#compose-quote')?.value || '';
 
         const metrics = {
-          tempF: parseInt(form.querySelector('#compose-temp')?.value || '68', 10),
+          tempF: parseInt(form.querySelector('#compose-temp')?.value || '62', 10),
           condition: form.querySelector('#compose-condition')?.value || 'Clear',
           waterSource: form.querySelector('#compose-water')?.value || '',
-          packWeightLbs: parseFloat(form.querySelector('#compose-pack')?.value || '26'),
-          dayMileage: parseFloat(form.querySelector('#compose-day-mileage')?.value || '0'),
+          packWeightLbs: parseFloat(form.querySelector('#compose-pack')?.value || '26.5'),
+          dayMileage: parseFloat(form.querySelector('#compose-day-mileage')?.value || '20.0'),
+          ascentFt: parseInt(form.querySelector('#compose-ascent')?.value || '3400', 10),
+          descentFt: parseInt(form.querySelector('#compose-descent')?.value || '2100', 10),
+          movingTime: form.querySelector('#compose-moving-time')?.value || '6h 30m',
           gearNotes: form.querySelector('#compose-gear-notes')?.value || ''
+        };
+
+        const voice = {
+          audioSrc: form.querySelector('#compose-voice-src')?.value || 'ambient-voice-recording',
+          duration: form.querySelector('#compose-voice-duration')?.value || '02:30',
+          transcript: form.querySelector('#compose-voice-transcript')?.value || ''
+        };
+
+        const scripture = {
+          source: form.querySelector('#compose-scripture-source')?.value || 'Bhagavad Gita',
+          citation: form.querySelector('#compose-scripture-citation')?.value || '',
+          transliteration: form.querySelector('#compose-scripture-transliteration')?.value || '',
+          translation: form.querySelector('#compose-scripture-translation')?.value || '',
+          purport: form.querySelector('#compose-scripture-purport')?.value || ''
+        };
+
+        const kirtan = {
+          streamUrl: form.querySelector('#compose-kirtan-stream')?.value || 'kirtan-stream-url',
+          artist: form.querySelector('#compose-kirtan-artist')?.value || 'DAM & Trail Sangha',
+          mantra: form.querySelector('#compose-kirtan-mantra')?.value || '',
+          translation: form.querySelector('#compose-kirtan-translation')?.value || '',
+          ragaOrMood: form.querySelector('#compose-kirtan-raga')?.value || ''
         };
 
         const photos = this.attachedPhotos.length > 0 ? this.attachedPhotos : [
           { src: 'photos/canopy.jpg', alt: location }
         ];
 
+        const payload = {
+          date,
+          mile,
+          location,
+          title,
+          category,
+          type,
+          body,
+          quote,
+          metrics,
+          voice,
+          scripture,
+          kirtan,
+          photos
+        };
+
         if (existing) {
-          store.updateEntry(existing.id, {
-            date,
-            mile,
-            location,
-            title,
-            quote,
-            body,
-            category,
-            layoutStyle,
-            metrics,
-            photos
-          });
+          store.updateEntry(existing.id, payload);
         } else {
-          store.addEntry({
-            date,
-            mile,
-            location,
-            title,
-            quote,
-            body,
-            category,
-            layoutStyle,
-            metrics,
-            photos
-          });
+          store.addEntry(payload);
         }
       } catch (err) {
         alert('Could not save update: ' + err.message);

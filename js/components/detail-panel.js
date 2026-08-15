@@ -1,10 +1,16 @@
 /**
- * DAM HIKES - Adaptive 3-Format TrailCard Component
- * Implements Rich Story, Minimalist Reflection, and Field Log display formats.
+ * DAM HIKES - 5-Type Adaptive DetailPanel Component
+ * Renders tailored visual cards for:
+ * 1. Statistics (data-first metrics, elevation splits, water status)
+ * 2. Title + Words (literary editorial prose, pull quotes, hero photo)
+ * 3. Title + Voice (interactive audio player, SVG waveform, transcript)
+ * 4. Scripture Reading (sacred gold card, Sanskrit transliteration, translation, purport)
+ * 5. Kirtan Streaming (devotional player, mantra chant lyrics, translation, raga mood)
  */
 
 import { elevationAtMile, formatElevation, formatMiles } from '../data/pct-route.js';
 import { store } from '../state.js';
+import { audioEngine } from '../audio.js';
 
 function formatFeedDate(isoStr) {
   if (!isoStr) return '';
@@ -38,6 +44,7 @@ export class DetailPanel {
     this.containerId = containerId;
     this.expanded = false;
     this.photoIndex = 0;
+    this.audioUnsub = null;
   }
 
   init() {
@@ -48,6 +55,40 @@ export class DetailPanel {
         this.render();
       }
     });
+
+    this.audioUnsub = audioEngine.subscribe(() => {
+      this.updateAudioVisuals();
+    });
+  }
+
+  updateAudioVisuals() {
+    const container = document.getElementById(this.containerId);
+    if (!container) return;
+
+    const playBtn = container.querySelector('.btn-audio-play-toggle');
+    const waveProgress = container.querySelector('.waveform-progress-bar');
+    const timeDisplay = container.querySelector('.audio-current-time');
+
+    if (playBtn) {
+      const isCur = audioEngine.isPlaying && audioEngine.playingId === store.selectedId;
+      playBtn.innerHTML = isCur
+        ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
+        : `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+      playBtn.classList.toggle('is-playing', isCur);
+    }
+
+    if (waveProgress) {
+      const isCur = audioEngine.playingId === store.selectedId;
+      waveProgress.style.width = isCur ? `${(audioEngine.progress * 100).toFixed(1)}%` : '0%';
+    }
+
+    if (timeDisplay && audioEngine.playingId === store.selectedId) {
+      const totalSec = 160;
+      const elapsed = Math.round(audioEngine.progress * totalSec);
+      const m = Math.floor(elapsed / 60);
+      const s = elapsed % 60;
+      timeDisplay.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
   }
 
   render() {
@@ -64,18 +105,15 @@ export class DetailPanel {
       return;
     }
 
+    const type = entry.type || (entry.scripture ? 'scripture' : entry.kirtan ? 'kirtan' : entry.voice ? 'voice' : entry.layoutStyle === 'fieldlog' ? 'statistics' : 'words');
     const elev = elevationAtMile(entry.mile);
     const photos = entry.photos || [];
     const one = photos.length <= 1;
-    const metrics = entry.metrics || {};
-    const layout = entry.layoutStyle || 'story';
-    const hasMetrics = metrics.tempF || metrics.condition || metrics.waterSource || metrics.packWeightLbs || metrics.dayMileage || metrics.gearNotes;
-    const paragraphs = (entry.body || '').split('\n\n').filter(Boolean);
 
-    // 1. Photos Carousel / Hero
+    // Photos Markup
     let photoHtml = '';
     if (photos.length > 0) {
-      if (one || layout === 'minimal') {
+      if (one) {
         photoHtml = `
           <div class="trail-card-photo-wrapper">
             <button type="button" class="carousel-slide-btn" id="single-photo-btn" aria-label="View photo in fullscreen">
@@ -103,233 +141,329 @@ export class DetailPanel {
       }
     }
 
-    // 2. Format-Specific Body Content
-    let bodyContentHtml = '';
+    let cardBodyHtml = '';
 
-    if (layout === 'minimal') {
-      // --- FORMAT 1: MINIMALIST REFLECTION ---
-      const leadQuote = entry.quote || paragraphs[0] || '';
-      
-      if (this.expanded) {
-        bodyContentHtml = `
-          <div class="trail-body-expanded format-minimal" id="trail-body-expanded-box">
-            ${leadQuote ? `
-              <blockquote class="minimal-centerpiece-quote">
-                “${leadQuote}”
-              </blockquote>
-            ` : ''}
-            
-            <div class="trail-story-prose">
-              ${paragraphs.map(p => `<p>${p}</p>`).join('')}
+    // --- 1. 📊 STATISTICS TYPE ---
+    if (type === 'statistics') {
+      const m = entry.metrics || {};
+      const ascent = m.ascentFt || 3850;
+      const descent = m.descentFt || 2150;
+      const movingTime = m.movingTime || '6h 45m';
+
+      cardBodyHtml = `
+        <div class="type-card-stats-layout">
+          <!-- Lead 4-Cell Conditions Grid -->
+          <div class="stats-four-grid">
+            <div class="stats-metric-cell">
+              <span class="stat-label">Weather</span>
+              <span class="stat-main-val">${m.tempF || 52}°F</span>
+              <span class="stat-sub-val">${m.condition || 'Clear Sky'}</span>
             </div>
-
-            <!-- Minimalist Clean Footer Stamp -->
-            <div class="trail-expanded-stats-footer" style="display: flex; align-items: center; justify-content: space-between;">
-              <div class="stats-badge-group">
-                <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">
-                  ${CATEGORY_NAMES[entry.category] || '📖 Reflection'}
-                </span>
-                <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
-              </div>
-              <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry" title="Edit entry">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                <span>Edit</span>
-              </button>
+            <div class="stats-metric-cell">
+              <span class="stat-label">Water Source</span>
+              <span class="stat-main-val">${m.waterSource || 'Alpine Stream'}</span>
+              <span class="stat-sub-val">Reliable flow</span>
+            </div>
+            <div class="stats-metric-cell">
+              <span class="stat-label">Pack Weight</span>
+              <span class="stat-main-val">${m.packWeightLbs || 26.5} lbs</span>
+              <span class="stat-sub-val">11.4 lb base</span>
+            </div>
+            <div class="stats-metric-cell">
+              <span class="stat-label">Daily Mileage</span>
+              <span class="stat-main-val">${m.dayMileage || 24.5} mi</span>
+              <span class="stat-sub-val">${movingTime}</span>
             </div>
           </div>
-          <button type="button" class="card-read-more-btn" id="btn-toggle-expand">Less</button>
-        `;
-      } else {
-        bodyContentHtml = `
-          <div class="trail-excerpt format-minimal" id="trail-excerpt-box" style="cursor: pointer;">
-            <blockquote class="minimal-lead-quote">
-              “${leadQuote}”
-            </blockquote>
-          </div>
-          <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More</button>
-        `;
-      }
 
-    } else if (layout === 'fieldlog') {
-      // --- FORMAT 2: FIELD LOG ---
-      const gridHtml = `
-        <div class="fieldlog-grid" style="margin: 8px 0 12px 0;">
-          <div class="field-cell">
-            <div class="field-label">Weather / Temp</div>
-            <div class="field-value">${metrics.tempF ? metrics.tempF + '°F' : '—'}${metrics.condition ? ` · ${metrics.condition}` : ''}</div>
-          </div>
-          <div class="field-cell">
-            <div class="field-label">Water Status</div>
-            <div class="field-value">${metrics.waterSource || 'Stream on trail'}</div>
-          </div>
-          <div class="field-cell">
-            <div class="field-label">Pack Weight</div>
-            <div class="field-value">${metrics.packWeightLbs ? metrics.packWeightLbs + ' lbs' : '11.4 lb base'}</div>
-          </div>
-          <div class="field-cell">
-            <div class="field-label">Daily Miles</div>
-            <div class="field-value">${metrics.dayMileage ? metrics.dayMileage + ' mi' : '—'}</div>
-          </div>
-        </div>
-      `;
-
-      if (this.expanded) {
-        bodyContentHtml = `
-          <div class="trail-body-expanded format-fieldlog" id="trail-body-expanded-box">
-            <!-- Lead 4-cell data grid -->
-            ${gridHtml}
-
-            ${metrics.gearNotes ? `
-              <div class="fieldlog-gear-notes" style="margin-bottom: 12px;">
-                <strong>⚙️ Resupply & Gear Notes:</strong> ${metrics.gearNotes}
-              </div>
-            ` : ''}
-
-            <div class="trail-story-prose">
-              ${paragraphs.map(p => `<p>${p}</p>`).join('')}
+          <!-- Elevation & Trail Splits -->
+          <div class="stats-splits-row">
+            <div class="split-cell">
+              <span class="split-label">Elevation Ascent</span>
+              <span class="split-val split-up">+${ascent.toLocaleString()} ft</span>
             </div>
+            <div class="split-divider"></div>
+            <div class="split-cell">
+              <span class="split-label">Elevation Descent</span>
+              <span class="split-val split-down">-${descent.toLocaleString()} ft</span>
+            </div>
+          </div>
 
-            <div class="trail-expanded-stats-footer">
-              <div class="stats-footer-header">
+          ${this.expanded ? `
+            <div class="trail-body-expanded" id="trail-body-expanded-box" style="margin-top: 10px;">
+              ${m.gearNotes ? `
+                <div class="fieldlog-gear-notes" style="margin-bottom: 10px;">
+                  <strong>⚙️ Gear & Resupply Intelligence:</strong> ${m.gearNotes}
+                </div>
+              ` : ''}
+              ${entry.body ? `
+                <div class="trail-story-prose">
+                  ${entry.body.split('\n\n').map(p => `<p>${p}</p>`).join('')}
+                </div>
+              ` : ''}
+              <div class="trail-expanded-stats-footer">
                 <div class="stats-badge-group">
-                  <span class="badge badge-category badge-cat-${entry.category || 'resupply'}">
-                    ${CATEGORY_NAMES[entry.category] || '🍕 Resupply'}
-                  </span>
+                  <span class="badge badge-category badge-cat-${entry.category || 'resupply'}">${CATEGORY_NAMES[entry.category] || '🍕 Resupply'}</span>
                   <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
                 </div>
-                <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry" title="Edit entry">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  <span>Edit</span>
-                </button>
+                <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry">Edit</button>
               </div>
             </div>
-          </div>
-          <button type="button" class="card-read-more-btn" id="btn-toggle-expand">Less</button>
-        `;
-      } else {
-        bodyContentHtml = `
-          <div class="trail-excerpt format-fieldlog" id="trail-excerpt-box" style="cursor: pointer;">
-            ${gridHtml}
-            <div style="font-size: 14px; color: rgba(236, 231, 220, 0.85); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-              ${paragraphs[0] || entry.body}
-            </div>
-          </div>
-          <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More</button>
-        `;
-      }
-
-    } else {
-      // --- FORMAT 3: RICH STORY (DEFAULT) ---
-      const statsFooterHtml = `
-        <div class="trail-expanded-stats-footer">
-          <div class="stats-footer-header">
-            <div class="stats-badge-group">
-              <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">
-                ${CATEGORY_NAMES[entry.category] || '📍 Moment'}
-              </span>
-              <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
-            </div>
-            
-            <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry" title="Edit this entry in composer">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              <span>Edit</span>
-            </button>
-          </div>
-
-          ${hasMetrics ? `
-            <div class="fieldlog-grid">
-              <div class="field-cell">
-                <div class="field-label">Weather / Temp</div>
-                <div class="field-value">${metrics.tempF ? metrics.tempF + '°F' : '—'}${metrics.condition ? ` · ${metrics.condition}` : ''}</div>
-              </div>
-              <div class="field-cell">
-                <div class="field-label">Water Status</div>
-                <div class="field-value">${metrics.waterSource || 'Stream on trail'}</div>
-              </div>
-              <div class="field-cell">
-                <div class="field-label">Pack Weight</div>
-                <div class="field-value">${metrics.packWeightLbs ? metrics.packWeightLbs + ' lbs' : '11.4 lb base'}</div>
-              </div>
-              <div class="field-cell">
-                <div class="field-label">Daily Miles</div>
-                <div class="field-value">${metrics.dayMileage ? metrics.dayMileage + ' mi' : '—'}</div>
-              </div>
-            </div>
-          ` : ''}
-
-          ${metrics.gearNotes ? `
-            <div class="fieldlog-gear-notes">
-              <strong>⚙️ Field & Gear Notes:</strong> ${metrics.gearNotes}
-            </div>
-          ` : ''}
+            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">Less</button>
+          ` : `
+            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More details</button>
+          `}
         </div>
       `;
 
-      if (this.expanded) {
-        bodyContentHtml = `
-          <div class="trail-body-expanded format-story" id="trail-body-expanded-box">
-            ${entry.quote ? `
-              <blockquote class="detail-pull-quote">
-                "${entry.quote}"
-              </blockquote>
-            ` : ''}
-            
-            <div class="trail-story-prose">
-              ${paragraphs.map(p => `<p>${p}</p>`).join('')}
+    // --- 2. ✍️ TITLE + WORDS TYPE ---
+    } else if (type === 'words') {
+      const paragraphs = (entry.body || '').split('\n\n').filter(Boolean);
+
+      cardBodyHtml = `
+        <div class="type-card-words-layout">
+          ${entry.quote ? `
+            <blockquote class="words-pull-quote">
+              “${entry.quote}”
+            </blockquote>
+          ` : ''}
+
+          ${this.expanded ? `
+            <div class="trail-body-expanded" id="trail-body-expanded-box">
+              <div class="trail-story-prose">
+                ${paragraphs.map(p => `<p>${p}</p>`).join('')}
+              </div>
+              <div class="trail-expanded-stats-footer" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="stats-badge-group">
+                  <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">${CATEGORY_NAMES[entry.category] || '📖 Reflection'}</span>
+                  <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
+                </div>
+                <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry">Edit</button>
+              </div>
+            </div>
+            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">Less</button>
+          ` : `
+            <div class="trail-excerpt" id="trail-excerpt-box" style="cursor: pointer;">
+              ${paragraphs[0] || entry.body}
+            </div>
+            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More</button>
+          `}
+        </div>
+      `;
+
+    // --- 3. 🎙️ TITLE + VOICE TYPE ---
+    } else if (type === 'voice') {
+      const v = entry.voice || {};
+      const duration = v.duration || '02:44';
+      const isCur = audioEngine.isPlaying && audioEngine.playingId === entry.id;
+
+      cardBodyHtml = `
+        <div class="type-card-voice-layout">
+          <!-- Voice Audio Player Bar -->
+          <div class="voice-player-bar">
+            <button type="button" class="btn-audio-play-toggle ${isCur ? 'is-playing' : ''}" id="btn-audio-toggle" aria-label="Play voice recording">
+              ${isCur ? `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              ` : `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              `}
+            </button>
+
+            <!-- SVG Waveform -->
+            <div class="waveform-container" id="waveform-scrubber">
+              <svg class="waveform-svg" viewBox="0 0 200 36" preserveAspectRatio="none">
+                <!-- Static Waveform Bars -->
+                <path d="M4 18v-8M10 18v-12M16 18v-6M22 18v-14M28 18v-10M34 18v-16M40 18v-12M46 18v-6M52 18v-14M58 18v-10M64 18v-16M70 18v-12M76 18v-8M82 18v-14M88 18v-16M94 18v-10M100 18v-14M106 18v-8M112 18v-12M118 18v-16M124 18v-10M130 18v-14M136 18v-8M142 18v-12M148 18v-16M154 18v-10M160 18v-14M166 18v-8M172 18v-12M178 18v-6M184 18v-10M190 18v-4M196 18v-8" stroke="rgba(236, 231, 220, 0.28)" stroke-width="2.5" stroke-linecap="round"></path>
+                <!-- Mirror Bottom Bars -->
+                <path d="M4 18v8M10 18v12M16 18v6M22 18v14M28 18v10M34 18v16M40 18v12M46 18v6M52 18v14M58 18v10M64 18v16M70 18v12M76 18v8M82 18v14M88 18v16M94 18v10M100 18v14M106 18v8M112 18v12M118 18v16M124 18v10M130 18v14M136 18v8M142 18v12M148 18v16M154 18v10M160 18v14M166 18v8M172 18v12M178 18v6M184 18v10M190 18v4M196 18v8" stroke="rgba(236, 231, 220, 0.28)" stroke-width="2.5" stroke-linecap="round"></path>
+              </svg>
+              <!-- Live Green Progress Waveform -->
+              <div class="waveform-progress-bar" style="width: ${isCur ? (audioEngine.progress * 100).toFixed(1) + '%' : '0%'};">
+                <svg class="waveform-svg active-wave" viewBox="0 0 200 36" preserveAspectRatio="none">
+                  <path d="M4 18v-8M10 18v-12M16 18v-6M22 18v-14M28 18v-10M34 18v-16M40 18v-12M46 18v-6M52 18v-14M58 18v-10M64 18v-16M70 18v-12M76 18v-8M82 18v-14M88 18v-16M94 18v-10M100 18v-14M106 18v-8M112 18v-12M118 18v-16M124 18v-10M130 18v-14M136 18v-8M142 18v-12M148 18v-16M154 18v-10M160 18v-14M166 18v-8M172 18v-12M178 18v-6M184 18v-10M190 18v-4M196 18v-8M4 18v8M10 18v12M16 18v6M22 18v14M28 18v10M34 18v16M40 18v12M46 18v6M52 18v14M58 18v10M64 18v16M70 18v12M76 18v8M82 18v14M88 18v16M94 18v10M100 18v14M106 18v8M112 18v12M118 18v16M124 18v10M130 18v14M136 18v8M142 18v12M148 18v16M154 18v10M160 18v14M166 18v8M172 18v12M178 18v6M184 18v10M190 18v4M196 18v8" stroke="#c5d4a8" stroke-width="2.5" stroke-linecap="round"></path>
+                </svg>
+              </div>
             </div>
 
-            ${statsFooterHtml}
+            <div class="audio-time-stamp">
+              <span class="audio-current-time">0:00</span> / ${duration}
+            </div>
           </div>
-          <button type="button" class="card-read-more-btn" id="btn-toggle-expand">Less</button>
-        `;
-      } else {
-        bodyContentHtml = `
-          <div class="trail-excerpt format-story" id="trail-excerpt-box" style="cursor: pointer;">
-            ${paragraphs[0] || entry.body}
+
+          <!-- Transcript Section -->
+          ${v.transcript ? `
+            <div class="voice-transcript-box">
+              <span class="transcript-header-label">🎙️ Voice Dispatch Transcript</span>
+              <p class="transcript-prose">${v.transcript}</p>
+            </div>
+          ` : ''}
+
+          <div class="trail-expanded-stats-footer" style="margin-top: 10px;">
+            <div class="stats-badge-group">
+              <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">${CATEGORY_NAMES[entry.category] || '🎙️ Voice'}</span>
+              <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
+            </div>
+            <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry">Edit</button>
           </div>
-          <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More</button>
-        `;
-      }
+        </div>
+      `;
+
+    // --- 4. 📜 SCRIPTURE READING TYPE ---
+    } else if (type === 'scripture') {
+      const s = entry.scripture || {};
+
+      cardBodyHtml = `
+        <div class="type-card-scripture-layout">
+          <!-- Scripture Reference Badge -->
+          <div class="scripture-badge-row">
+            <span class="scripture-citation-pill">📜 ${s.source || 'Bhagavad Gita'} ${s.citation || ''}</span>
+          </div>
+
+          <!-- Sanskrit / Original Transliteration -->
+          ${s.transliteration ? `
+            <blockquote class="scripture-sanskrit-verse">
+              ${s.transliteration}
+            </blockquote>
+          ` : ''}
+
+          <!-- Translation -->
+          <div class="scripture-translation-box">
+            <span class="translation-lead-word">Translation:</span>
+            <p class="scripture-translation-prose">${s.translation || ''}</p>
+          </div>
+
+          <!-- Purport & Realization -->
+          ${s.purport ? `
+            <div class="scripture-purport-box">
+              <span class="purport-header-label">Trail Realization & Purport</span>
+              <p class="purport-prose">${s.purport}</p>
+            </div>
+          ` : ''}
+
+          <div class="trail-expanded-stats-footer" style="margin-top: 10px;">
+            <div class="stats-badge-group">
+              <span class="badge badge-category badge-cat-reflection">📖 Sacred Verse</span>
+              <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
+            </div>
+            <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry">Edit</button>
+          </div>
+        </div>
+      `;
+
+    // --- 5. 📿 KIRTAN STREAMING TYPE ---
+    } else if (type === 'kirtan') {
+      const k = entry.kirtan || {};
+      const isCur = audioEngine.isPlaying && audioEngine.playingId === entry.id;
+
+      cardBodyHtml = `
+        <div class="type-card-kirtan-layout">
+          <!-- Saffron Stream Badge -->
+          <div class="kirtan-badge-row">
+            <span class="kirtan-stream-pill">📿 KIRTAN STREAM · MEDITATION</span>
+          </div>
+
+          <!-- Kirtan Audio Player Bar -->
+          <div class="kirtan-player-bar">
+            <button type="button" class="btn-kirtan-play-toggle ${isCur ? 'is-playing' : ''}" id="btn-kirtan-toggle" aria-label="Play devotional kirtan stream">
+              ${isCur ? `
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              ` : `
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              `}
+            </button>
+
+            <div class="kirtan-track-info">
+              <div class="kirtan-track-name">${entry.title}</div>
+              <div class="kirtan-artist-name">${k.artist || 'Daniel & Trail Sangha'}</div>
+            </div>
+
+            <div class="kirtan-live-indicator ${isCur ? 'live-pulsing' : ''}">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <!-- Mantra Lyrics Box -->
+          ${k.mantra ? `
+            <div class="kirtan-mantra-box">
+              <span class="mantra-header-label">Sanskrit Mantra Chant</span>
+              <pre class="mantra-lyrics-text">${k.mantra}</pre>
+            </div>
+          ` : ''}
+
+          <!-- Translation & Raga Notes -->
+          ${k.translation ? `
+            <div class="kirtan-translation-notes">
+              <p><strong>Devotional Meaning:</strong> ${k.translation}</p>
+            </div>
+          ` : ''}
+
+          ${k.ragaOrMood ? `
+            <div class="kirtan-raga-notes">
+              <strong>🪕 Setting & Raga:</strong> ${k.ragaOrMood}
+            </div>
+          ` : ''}
+
+          <div class="trail-expanded-stats-footer" style="margin-top: 10px;">
+            <div class="stats-badge-group">
+              <span class="badge badge-category badge-cat-reflection">📿 Devotional Stream</span>
+              <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
+            </div>
+            <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry">Edit</button>
+          </div>
+        </div>
+      `;
     }
 
     container.innerHTML = `
-      <article class="trail-card-article ${this.expanded ? 'is-expanded' : ''} format-${layout}">
+      <article class="trail-card-article type-${type}">
         ${photoHtml}
 
         <div class="trail-card-content">
-          <!-- Clean Monospace Meta Stamp -->
+          <!-- Monospace Metadata Stamp -->
           <p class="card-meta-stamp">
             ${formatFeedDate(entry.date)} · ${entry.location} · mi ${formatMiles(entry.mile)} · ${formatElevation(elev.elevFt)}
           </p>
 
-          <!-- Heading -->
-          <h2 class="card-heading" id="card-heading-title" style="cursor: pointer;">
+          <!-- Heading Title -->
+          <h2 class="card-heading" id="card-heading-title">
             ${entry.title}
           </h2>
 
-          <!-- Adaptive Body Content -->
-          ${bodyContentHtml}
+          <!-- Type-Tailored Card Body -->
+          ${cardBodyHtml}
         </div>
       </article>
     `;
 
-    this.attachEvents(container, entry, photos);
+    this.attachEvents(container, entry, photos, type);
   }
 
-  attachEvents(container, entry, photos) {
+  attachEvents(container, entry, photos, type) {
     const toggle = () => {
       this.expanded = !this.expanded;
       this.render();
     };
 
     container.querySelector('#btn-toggle-expand')?.addEventListener('click', toggle);
-    container.querySelector('#card-heading-title')?.addEventListener('click', toggle);
-    container.querySelector('#trail-excerpt-box')?.addEventListener('click', toggle);
 
     // Quick Edit Button
     container.querySelector('#btn-quick-edit-entry')?.addEventListener('click', (e) => {
       e.stopPropagation();
       store.setSheet('compose', entry.id);
+    });
+
+    // Audio Play Toggle (Voice)
+    container.querySelector('#btn-audio-toggle')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audioEngine.toggle('voice', entry.id, 160);
+      this.render();
+    });
+
+    // Audio Play Toggle (Kirtan)
+    container.querySelector('#btn-kirtan-toggle')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audioEngine.toggle('kirtan', entry.id, 300);
+      this.render();
     });
 
     // Single Photo Lightbox
@@ -339,7 +473,7 @@ export class DetailPanel {
       }
     });
 
-    // Carousel Scroll & Lightbox
+    // Carousel Scroll
     const track = container.querySelector('#photo-carousel-track');
     if (track) {
       track.addEventListener('scroll', () => {

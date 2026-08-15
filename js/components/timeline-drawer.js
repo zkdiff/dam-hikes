@@ -89,21 +89,29 @@ export class TimelineDrawer {
           ` : filtered.map(item => {
             const isSelected = item.id === selectedId;
             const photoSrc = item.photos && item.photos.length > 0 ? item.photos[0].src : null;
+            const itemType = item.type || (item.scripture ? 'scripture' : item.kirtan ? 'kirtan' : item.voice ? 'voice' : item.layoutStyle === 'fieldlog' ? 'statistics' : 'words');
+            const typeLabels = {
+              statistics: '📊 Stats',
+              words: '✍️ Words',
+              voice: '🎙️ Voice',
+              scripture: '📜 Scripture',
+              kirtan: '📿 Kirtan'
+            };
 
             return `
               <div class="drawer-timeline-card ${isSelected ? 'selected' : ''}" data-id="${item.id}" style="display: flex; gap: 10px; padding: 10px; border-radius: var(--radius-sm); background: var(--color-surface); border: 1px solid ${isSelected ? 'var(--color-trail)' : 'var(--color-border)'}; cursor: pointer;">
                 ${photoSrc ? `
-                  <img src="${photoSrc}" alt="${item.title}" style="width: 52px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" />
+                  <img src="${photoSrc}" alt="${item.title}" style="width: 54px; height: 54px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" />
                 ` : ''}
                 <div style="flex: 1; min-width: 0;">
-                  <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-muted); font-family: var(--font-mono); margin-bottom: 2px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--color-muted); font-family: var(--font-mono); margin-bottom: 2px;">
                     <span>mi ${formatMiles(item.mile)} · Day ${item.dayNumber || 1}</span>
-                    <span>${item.date}</span>
+                    <span style="font-size: 10px; padding: 1px 6px; border-radius: 4px; background: rgba(228, 220, 203, 0.08); color: var(--color-trail);">${typeLabels[itemType] || '✍️ Entry'}</span>
                   </div>
-                  <h4 style="font-family: var(--font-display); font-size: 15px; color: var(--color-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <h4 style="font-family: var(--font-display); font-size: 14.5px; color: var(--color-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 1px 0;">
                     ${item.title}
                   </h4>
-                  <p style="font-size: 12px; color: var(--color-subtle); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <p style="font-size: 11.5px; color: var(--color-subtle); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                     📍 ${item.location}
                   </p>
                 </div>
