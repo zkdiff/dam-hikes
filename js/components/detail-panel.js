@@ -1,6 +1,6 @@
 /**
  * DAM HIKES - Clean, Minimalist TrailCard Component
- * Uncluttered collapsed state; structured stats placed in dedicated expanded footer.
+ * Structured field stats integrated directly at the bottom of the expanded scrollable story container.
  */
 
 import { elevationAtMile, formatElevation, formatMiles } from '../data/pct-route.js';
@@ -71,6 +71,7 @@ export class DetailPanel {
     const photos = entry.photos || [];
     const one = photos.length <= 1;
     const metrics = entry.metrics || {};
+    const hasMetrics = metrics.tempF || metrics.condition || metrics.waterSource || metrics.packWeightLbs || metrics.dayMileage || metrics.gearNotes;
 
     // 1. Photos Carousel
     let photoHtml = '';
@@ -103,94 +104,97 @@ export class DetailPanel {
       }
     }
 
-    // 2. Structured Stats Section (Only rendered when expanded)
-    let statsSectionHtml = '';
-    if (this.expanded) {
-      const hasMetrics = metrics.tempF || metrics.condition || metrics.waterSource || metrics.packWeightLbs || metrics.dayMileage || metrics.gearNotes;
-
-      statsSectionHtml = `
-        <div class="card-expanded-stats-box">
-          <div class="stats-box-header">
-            <div class="stats-badge-group">
-              <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">
-                ${CATEGORY_NAMES[entry.category] || '📍 Moment'}
-              </span>
-              <span class="badge badge-section">
-                ${SECTION_NAMES[entry.section] || 'PCT'}
-              </span>
-            </div>
-            
-            <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry" title="Edit this entry in composer">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              <span>Edit</span>
-            </button>
+    // 2. Structured Stats Section (Rendered inside the expanded container at the bottom)
+    const statsFooterHtml = `
+      <div class="trail-expanded-stats-footer">
+        <div class="stats-footer-header">
+          <div class="stats-badge-group">
+            <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">
+              ${CATEGORY_NAMES[entry.category] || '📍 Moment'}
+            </span>
+            <span class="badge badge-section">
+              ${SECTION_NAMES[entry.section] || 'PCT'}
+            </span>
           </div>
-
-          ${hasMetrics ? `
-            <div class="fieldlog-grid">
-              <div class="field-cell">
-                <div class="field-label">Weather / Temp</div>
-                <div class="field-value">${metrics.tempF ? metrics.tempF + '°F' : '—'}${metrics.condition ? ` · ${metrics.condition}` : ''}</div>
-              </div>
-              <div class="field-cell">
-                <div class="field-label">Water Status</div>
-                <div class="field-value">${metrics.waterSource || 'Stream on trail'}</div>
-              </div>
-              <div class="field-cell">
-                <div class="field-label">Pack Weight</div>
-                <div class="field-value">${metrics.packWeightLbs ? metrics.packWeightLbs + ' lbs' : '11.4 lb base'}</div>
-              </div>
-              <div class="field-cell">
-                <div class="field-label">Daily Miles</div>
-                <div class="field-value">${metrics.dayMileage ? metrics.dayMileage + ' mi' : '—'}</div>
-              </div>
-            </div>
-          ` : ''}
-
-          ${metrics.gearNotes ? `
-            <div class="fieldlog-gear-notes">
-              <strong>⚙️ Field & Gear Notes:</strong> ${metrics.gearNotes}
-            </div>
-          ` : ''}
+          
+          <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry" title="Edit this entry in composer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>Edit</span>
+          </button>
         </div>
-      `;
-    }
+
+        ${hasMetrics ? `
+          <div class="fieldlog-grid">
+            <div class="field-cell">
+              <div class="field-label">Weather / Temp</div>
+              <div class="field-value">${metrics.tempF ? metrics.tempF + '°F' : '—'}${metrics.condition ? ` · ${metrics.condition}` : ''}</div>
+            </div>
+            <div class="field-cell">
+              <div class="field-label">Water Status</div>
+              <div class="field-value">${metrics.waterSource || 'Stream on trail'}</div>
+            </div>
+            <div class="field-cell">
+              <div class="field-label">Pack Weight</div>
+              <div class="field-value">${metrics.packWeightLbs ? metrics.packWeightLbs + ' lbs' : '11.4 lb base'}</div>
+            </div>
+            <div class="field-cell">
+              <div class="field-label">Daily Miles</div>
+              <div class="field-value">${metrics.dayMileage ? metrics.dayMileage + ' mi' : '—'}</div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${metrics.gearNotes ? `
+          <div class="fieldlog-gear-notes">
+            <strong>⚙️ Field & Gear Notes:</strong> ${metrics.gearNotes}
+          </div>
+        ` : ''}
+      </div>
+    `;
 
     // 3. Body Content
-    const bodyText = entry.body ? entry.body.replace(/\n\n/g, '<br/><br/>') : '';
+    const paragraphs = (entry.body || '').split('\n\n').filter(Boolean);
 
     container.innerHTML = `
       <article class="trail-card-article ${this.expanded ? 'is-expanded' : ''}">
         ${photoHtml}
 
         <div class="trail-card-content">
-          <!-- Clean Meta Stamp -->
+          <!-- Clean Monospace Meta Stamp -->
           <p class="card-meta-stamp">
             ${formatFeedDate(entry.date)} · ${entry.location} · mi ${formatMiles(entry.mile)} · ${formatElevation(elev.elevFt)}
           </p>
 
-          <!-- Title & Story -->
-          <button type="button" class="card-title-toggle-btn" id="btn-toggle-expand">
-            <h2 class="card-heading">${entry.title}</h2>
-            
-            ${this.expanded ? `
-              <div class="trail-body-expanded">
-                ${entry.quote ? `
-                  <blockquote class="detail-pull-quote">
-                    "${entry.quote}"
-                  </blockquote>
-                ` : ''}
-                <div class="trail-body-text">${bodyText}</div>
-                ${statsSectionHtml}
+          <!-- Heading -->
+          <h2 class="card-heading" id="card-heading-title" style="cursor: pointer;">
+            ${entry.title}
+          </h2>
+
+          <!-- Collapsed vs Expanded Content -->
+          ${this.expanded ? `
+            <div class="trail-body-expanded" id="trail-body-expanded-box">
+              ${entry.quote ? `
+                <blockquote class="detail-pull-quote">
+                  "${entry.quote}"
+                </blockquote>
+              ` : ''}
+              
+              <div class="trail-story-prose">
+                ${paragraphs.map(p => `<p>${p}</p>`).join('')}
               </div>
-            ` : `
-              <div class="trail-excerpt">
-                ${bodyText}
-              </div>
-            `}
+
+              <!-- Structured Stats at the bottom of the expanded container -->
+              ${statsFooterHtml}
+            </div>
             
-            <span class="card-read-more-hint">${!this.expanded ? 'More' : 'Less'}</span>
-          </button>
+            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">Less</button>
+          ` : `
+            <div class="trail-excerpt" id="trail-excerpt-box" style="cursor: pointer;">
+              ${paragraphs[0] || entry.body}
+            </div>
+
+            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More</button>
+          `}
 
           <!-- Step Navigation Footer -->
           <div class="trail-card-footer-nav">
@@ -212,13 +216,15 @@ export class DetailPanel {
   }
 
   attachEvents(container, entry, photos) {
-    // Expand / Collapse Toggle
-    container.querySelector('#btn-toggle-expand')?.addEventListener('click', (e) => {
-      // Don't toggle if clicking a button inside
-      if (e.target.closest('#btn-quick-edit-entry') || e.target.closest('a')) return;
+    // Toggle expand
+    const toggle = () => {
       this.expanded = !this.expanded;
       this.render();
-    });
+    };
+
+    container.querySelector('#btn-toggle-expand')?.addEventListener('click', toggle);
+    container.querySelector('#card-heading-title')?.addEventListener('click', toggle);
+    container.querySelector('#trail-excerpt-box')?.addEventListener('click', toggle);
 
     // Step Prev / Next
     container.querySelector('#btn-card-prev')?.addEventListener('click', () => {
@@ -228,7 +234,7 @@ export class DetailPanel {
       store.step(1);
     });
 
-    // Quick Edit Button (inside stats section)
+    // Quick Edit Button
     container.querySelector('#btn-quick-edit-entry')?.addEventListener('click', (e) => {
       e.stopPropagation();
       store.setSheet('compose', entry.id);

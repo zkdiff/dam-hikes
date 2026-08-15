@@ -408,15 +408,13 @@ button:disabled {
 .badge-cat-hardship { background: rgba(239, 68, 68, 0.18); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.35); }
 .badge-cat-reflection { background: rgba(236, 72, 153, 0.18); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.35); }
 
-.card-expanded-stats-box {
-  margin-top: 14px;
-  padding: 10px 12px;
-  background: rgba(18, 20, 16, 0.65);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+.trail-expanded-stats-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(236, 231, 220, 0.1);
 }
 
-.stats-box-header {
+.stats-footer-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -759,14 +757,6 @@ button:disabled {
   font-family: var(--font-mono);
 }
 
-.card-title-toggle-btn {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 0;
-  margin-top: 4px;
-}
-
 .card-heading {
   font-family: var(--font-display);
   font-size: 1.45rem;
@@ -774,6 +764,7 @@ button:disabled {
   letter-spacing: -0.02em;
   color: var(--color-fg);
   font-weight: 600;
+  margin-top: 4px;
 }
 
 .trail-excerpt {
@@ -788,24 +779,33 @@ button:disabled {
 
 .trail-body-expanded {
   margin-top: 8px;
-  max-height: 28dvh;
+  max-height: 32dvh;
   overflow-y: auto;
-  white-space: pre-wrap;
   font-size: 14.5px;
   line-height: 1.65;
   color: rgba(236, 231, 220, 0.92);
+  padding-right: 4px;
 }
 
-.trail-body-expanded p {
-  margin-bottom: 8px;
+.trail-story-prose p {
+  margin-bottom: 10px;
+}
+.trail-story-prose p:last-child {
+  margin-bottom: 0;
 }
 
-.card-read-more-hint {
+.card-read-more-btn {
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 13.5px;
   color: var(--color-trail);
   font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s ease;
+}
+.card-read-more-btn:hover {
+  opacity: 0.8;
 }
 
 /* Step Navigation Footer */
