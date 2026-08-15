@@ -195,19 +195,6 @@ export class DetailPanel {
 
             <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More</button>
           `}
-
-          <!-- Step Navigation Footer -->
-          <div class="trail-card-footer-nav">
-            <button type="button" class="btn-step-arrow" id="btn-card-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on the trail">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <p class="trail-step-count">
-              ${index + 1} / ${total} on trail
-            </p>
-            <button type="button" class="btn-step-arrow" id="btn-card-next" ${index >= total - 1 ? 'disabled' : ''} aria-label="Next update, south on the trail">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
         </div>
       </article>
     `;
@@ -225,14 +212,6 @@ export class DetailPanel {
     container.querySelector('#btn-toggle-expand')?.addEventListener('click', toggle);
     container.querySelector('#card-heading-title')?.addEventListener('click', toggle);
     container.querySelector('#trail-excerpt-box')?.addEventListener('click', toggle);
-
-    // Step Prev / Next
-    container.querySelector('#btn-card-prev')?.addEventListener('click', () => {
-      store.step(-1);
-    });
-    container.querySelector('#btn-card-next')?.addEventListener('click', () => {
-      store.step(1);
-    });
 
     // Quick Edit Button
     container.querySelector('#btn-quick-edit-entry')?.addEventListener('click', (e) => {

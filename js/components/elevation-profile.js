@@ -1,5 +1,5 @@
 /**
- * DAM HIKES - SVG Elevation Profile & Interactive Scrubber Component
+ * DAM HIKES - SVG Elevation Profile with Integrated Step Navigation Component
  */
 
 import { START_MILE, ELEVATION_PROFILE, elevationAtMile, formatElevation, formatMiles } from '../data/pct-route.js';
@@ -50,7 +50,7 @@ export class ElevationProfile {
   init() {
     this.render();
     store.subscribe((s, eventType) => {
-      if (['select_change', 'entry_added', 'scrub_change'].includes(eventType)) {
+      if (['select_change', 'entry_added', 'entry_updated', 'entry_deleted', 'filter_change', 'scrub_change'].includes(eventType)) {
         this.render();
       }
     });
@@ -68,20 +68,37 @@ export class ElevationProfile {
     const here = profilePoint(currentMile, VW, VH);
     const focus = profilePoint(focusMile, VW, VH);
     const walkedWidth = mileToX(currentMile, VW);
-    const ordered = store.getOrderedEntries();
 
-    const marksHtml = ordered.map(entry => {
+    const filtered = store.getFilteredEntries();
+    const index = filtered.findIndex(e => e.id === selected?.id);
+    const total = filtered.length;
+
+    const marksHtml = filtered.map(entry => {
       const pt = profilePoint(entry.mile, VW, VH);
-      return `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="3.2" fill="#ece7dc" stroke="#121410" stroke-width="1"></circle>`;
+      const isCur = selected && entry.id === selected.id;
+      return `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${isCur ? '4.5' : '3.2'}" fill="${isCur ? '#c5d4a8' : '#ece7dc'}" stroke="#121410" stroke-width="1"></circle>`;
     }).join('');
 
     container.innerHTML = `
       <div class="elevation-profile-header">
-        <span class="elevation-title-label">Elevation</span>
-        <span class="elevation-readout">
-          ${formatElevation(sample.elevFt)}
-          <span class="elevation-readout-sub"> · mi ${formatMiles(sample.mile)}${sample.label ? ' · ' + sample.label : ''}</span>
-        </span>
+        <div class="elevation-header-left">
+          <span class="elevation-title-label">Elevation</span>
+          <span class="elevation-readout">
+            ${formatElevation(sample.elevFt)}
+            <span class="elevation-readout-sub"> · mi ${formatMiles(sample.mile)}${sample.label ? ' · ' + sample.label : ''}</span>
+          </span>
+        </div>
+
+        <!-- Integrated Previous / Next Navigation -->
+        <div class="elevation-header-nav">
+          <button type="button" class="btn-elev-step" id="btn-elev-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on trail" title="Previous update (North)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span class="elev-step-count">${total > 0 ? `${index + 1} / ${total}` : '—'}</span>
+          <button type="button" class="btn-elev-step" id="btn-elev-next" ${index >= total - 1 ? 'disabled' : ''} aria-label="Next update, south on trail" title="Next update (South)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
       </div>
 
       <svg viewBox="0 0 ${VW} ${VH}" class="elevation-svg-chart" id="elevation-svg" role="img" aria-label="Elevation profile from Cascade Locks to Campo">
@@ -129,6 +146,16 @@ export class ElevationProfile {
   }
 
   attachEvents(container) {
+    // Step Prev / Next Buttons
+    container.querySelector('#btn-elev-prev')?.addEventListener('click', () => {
+      store.step(-1);
+    });
+
+    container.querySelector('#btn-elev-next')?.addEventListener('click', () => {
+      store.step(1);
+    });
+
+    // Elevation SVG scrubber
     const svg = container.querySelector('#elevation-svg');
     if (!svg) return;
 
