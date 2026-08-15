@@ -218,36 +218,21 @@ export class DetailPanel {
 
     // --- 2. ✍️ TITLE + WORDS TYPE ---
     } else if (type === 'words') {
-      const paragraphs = (entry.body || '').split('\n\n').filter(Boolean);
+      const text = entry.body || entry.quote || '';
 
       cardBodyHtml = `
         <div class="type-card-words-layout">
-          ${entry.quote ? `
-            <blockquote class="words-pull-quote">
-              “${entry.quote}”
-            </blockquote>
-          ` : ''}
+          <div class="words-direct-statement">
+            “${text.replace(/^["“]|["”]$/g, '')}”
+          </div>
 
-          ${this.expanded ? `
-            <div class="trail-body-expanded" id="trail-body-expanded-box">
-              <div class="trail-story-prose">
-                ${paragraphs.map(p => `<p>${p}</p>`).join('')}
-              </div>
-              <div class="trail-expanded-stats-footer" style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="stats-badge-group">
-                  <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">${CATEGORY_NAMES[entry.category] || '📖 Reflection'}</span>
-                  <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
-                </div>
-                <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry">Edit</button>
-              </div>
+          <div class="trail-expanded-stats-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <div class="stats-badge-group">
+              <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">${CATEGORY_NAMES[entry.category] || '📖 Reflection'}</span>
+              <span class="badge badge-section">${SECTION_NAMES[entry.section] || 'PCT'}</span>
             </div>
-            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">Less</button>
-          ` : `
-            <div class="trail-excerpt" id="trail-excerpt-box" style="cursor: pointer;">
-              ${paragraphs[0] || entry.body}
-            </div>
-            <button type="button" class="card-read-more-btn" id="btn-toggle-expand">More</button>
-          `}
+            <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry">Edit</button>
+          </div>
         </div>
       `;
 
@@ -311,12 +296,14 @@ export class DetailPanel {
     // --- 4. 📜 SCRIPTURE READING TYPE ---
     } else if (type === 'scripture') {
       const s = entry.scripture || {};
+      const sourceName = s.source ? s.source.replace(' (prabhupadabooks.com)', '') : 'Bhagavad-gītā As It Is';
 
       cardBodyHtml = `
         <div class="type-card-scripture-layout">
-          <!-- Scripture Reference Badge -->
-          <div class="scripture-badge-row">
-            <span class="scripture-citation-pill">📜 ${s.source || 'Bhagavad Gita'} ${s.citation || ''}</span>
+          <!-- Scripture Reference Badge & Link -->
+          <div class="scripture-badge-row" style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="scripture-citation-pill">📜 ${sourceName} ${s.citation || ''}</span>
+            <a href="https://prabhupadabooks.com/" target="_blank" rel="noopener noreferrer" style="font-size: 10.5px; color: #fbbf24; text-decoration: underline; font-family: var(--font-mono);">prabhupadabooks.com ↗</a>
           </div>
 
           <!-- Sanskrit / Original Transliteration -->
@@ -328,14 +315,14 @@ export class DetailPanel {
 
           <!-- Translation -->
           <div class="scripture-translation-box">
-            <span class="translation-lead-word">Translation:</span>
+            <span class="translation-lead-word">Translation (Śrīla Prabhupāda):</span>
             <p class="scripture-translation-prose">${s.translation || ''}</p>
           </div>
 
           <!-- Purport & Realization -->
           ${s.purport ? `
             <div class="scripture-purport-box">
-              <span class="purport-header-label">Trail Realization & Purport</span>
+              <span class="purport-header-label">Purport & Trail Realization</span>
               <p class="purport-prose">${s.purport}</p>
             </div>
           ` : ''}

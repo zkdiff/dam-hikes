@@ -599,14 +599,14 @@ button:disabled {
   margin-top: 4px;
 }
 
-.words-pull-quote {
+.words-direct-statement {
   font-family: var(--font-display);
-  font-size: 16.5px;
+  font-size: 18px;
   font-style: italic;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--color-paper);
   border-left: 3px solid var(--color-primary);
-  padding-left: 12px;
+  padding: 4px 0 4px 14px;
   margin: 6px 0 8px 0;
 }
 

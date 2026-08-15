@@ -1,7 +1,11 @@
 /**
  * DAM HIKES - Authentic Thru-Hike Dataset (2,150 Miles)
  * Daniel Armando Martinez (DAM) - Southbound Pacific Crest Trail
- * Featuring 5 Update Types: Statistics, Title + Words, Title + Voice, Scripture Reading, Kirtan Streaming
+ * 
+ * Scripture Sources Exclusively From: https://prabhupadabooks.com/
+ * (Bhagavad-gītā As It Is, Śrī Īśopaniṣad, and Authorized BBT Works by A.C. Bhaktivedanta Swami Prabhupada)
+ * 
+ * Title + Words entries are kept direct, evocative, and punchy.
  */
 
 export const MOMENTS_SEED = [
@@ -17,24 +21,18 @@ export const MOMENTS_SEED = [
     section: "oregon",
     elevationFt: 180,
     category: "milestone",
-    quote: "Washington on one bank, Oregon on the other. I only need the Oregon one.",
     photos: [
       { src: "photos/bridge-gods.jpg", alt: "Bridge of the Gods over the Columbia River" },
-      { src: "photos/town-waterfront.jpg", alt: "Cascade Locks waterfront in late summer" },
-      { src: "photos/river-dusk.jpg", alt: "Columbia River at dusk" }
+      { src: "photos/town-waterfront.jpg", alt: "Cascade Locks waterfront in late summer" }
     ],
-    body: `The metal grating vibrates under every passing log truck. Look down through the diamond grid and the Columbia River churns slate-gray and fast two hundred feet below.
-
-Behind me sits Washington and the cold North Cascades. In front of me: the green wall of Oregon, three thousand vertical feet of volcanic basalt rising straight up into the clouds.
-
-I adjust the hip belt, tap the southern terminus sign, and take the first step.`
+    body: "Washington on one bank, Oregon on the other. Look down through the diamond steel grating and the river churns two hundred feet below. I only need the southern bank."
   },
   {
     id: "columbia-river-scripture",
     date: "2026-08-15",
     dayNumber: 2,
     type: "scripture",
-    title: "The River Finds the Low Ground",
+    title: "Accepting One's Quota on the Trail",
     location: "Eagle Creek Junction, OR",
     mile: 2142.0,
     soboMile: 8.0,
@@ -45,11 +43,11 @@ I adjust the hip belt, tap the southern terminus sign, and take the first step.`
       { src: "photos/river-dusk.jpg", alt: "Misty river gorge flowing over smooth river stones" }
     ],
     scripture: {
-      source: "Tao Te Ching",
-      citation: "Chapter 8",
-      transliteration: "Shang shan ruo shui. Shui shan li wan wu er bu zheng, chu zhong ren zhi suo wu, gu ji yu dao.",
-      translation: "The supreme good is like water, which nourishes all things without trying to. It is content with the low places that people disdain. Thus it is like the Tao.",
-      purport: "Climbing out of the gorge with a full food carry, my instinct was to fight the gradient. But watching the creek drop effortlessly through the canyon showed me the rhythm of walking: yield to the grade, stay supple in the knees, let gravity do what it will while the breath stays calm."
+      source: "Śrī Īśopaniṣad (prabhupadabooks.com)",
+      citation: "Mantra 1",
+      transliteration: "īśāvāsyam idaṁ sarvaṁ yat kiñca jagatyāṁ jagat / tena tyaktena bhuñjīthā mā gṛdhaḥ kasya svid dhanam",
+      translation: "Everything animate or inanimate that is within the universe is controlled and owned by the Lord. One should therefore accept only those things necessary for himself, which are set aside as his quota, and one should not accept other things, knowing well to whom they belong.",
+      purport: "Śrīla Prabhupāda explains: 'The root of all trouble is that man claims proprietary rights over the resources of nature.' On the trail, you learn this instantly: carry only your quota for the day — no more, no less — and recognize every spring, ridge, and sunrise as the Lord's property."
     }
   },
   {
@@ -64,14 +62,11 @@ I adjust the hip belt, tap the southern terminus sign, and take the first step.`
     section: "oregon",
     elevationFt: 3400,
     category: "reflection",
-    quote: "Hood is the first mountain I have to walk around. After that the trail is a long green cathedral.",
     photos: [
       { src: "photos/mt-hood.jpg", alt: "Mount Hood peak emerging above the fir canopy" },
       { src: "photos/canopy.jpg", alt: "Dense old-growth Douglas fir canopy with filtered morning light" }
     ],
-    body: `The firs here are four hundred years old. Their needles muffle footsteps until the only sound is the rhythmic slide of nylon shorts and the tap of carbon trekking pole tips on soft loam.
-
-Through a break in the canopy, Mount Hood looms white and massive. It feels impossible that in four days I will be on the opposite side looking back at its southern glaciers.`
+    body: "Hood is the first mountain I have to walk around. After that the trail is a long green cathedral."
   },
   {
     id: "hood-rim-voice",
@@ -126,7 +121,7 @@ Through a break in the canopy, Mount Hood looms white and massive. It feels impo
     date: "2026-08-26",
     dayNumber: 13,
     type: "scripture",
-    title: "Trance by Intelligence Under Mount Jefferson",
+    title: "Step by Step with Fixed Conviction",
     location: "Jefferson Park, OR",
     mile: 2045.0,
     soboMile: 105.0,
@@ -137,11 +132,11 @@ Through a break in the canopy, Mount Hood looms white and massive. It feels impo
       { src: "photos/hiker-back.jpg", alt: "Hiker sitting in meditation on a granite boulder facing alpine lake" }
     ],
     scripture: {
-      source: "Bhagavad Gita",
+      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
       citation: "Chapter 6, Verse 25",
       transliteration: "śanaiḥ śanair uparamed buddhyā dhṛti-gṛhītayā / ātma-saṁsthaṁ manaḥ kṛtvā na kiñcid api cintayet",
       translation: "Gradually, step by step, one should become situated in trance by means of intelligence sustained by full conviction, and thus the mind should be fixed on the Self alone and should think of nothing else.",
-      purport: "Sitting by Scout Lake at dawn with Mount Jefferson reflected like polished glass on the water. 'Śanaiḥ śanaiḥ' — step by step. Thru-hiking is not conquered in great leaps; it is 2,150 miles of single conscious steps. When the mind wants to rush forward to the Sierra, the verse pulls consciousness back to this immediate footfall."
+      purport: "Śrīla Prabhupāda writes in his purport: 'By proper conviction and intelligence one should gradually cease sense activities. This is called pratyāhāra. The mind, being restrained from all sense activities, should be fixed in trance, thinking of nothing else.' On the trail, 'śanaiḥ śanair' (step by step) is the foundational truth — you do not leap across 2,150 miles; you place one conscious foot forward at a time."
     }
   },
   {
@@ -149,7 +144,7 @@ Through a break in the canopy, Mount Hood looms white and massive. It feels impo
     date: "2026-09-02",
     dayNumber: 20,
     type: "kirtan",
-    title: "Radhe Govinda & Campfire Japa at North Santiam",
+    title: "Maha-Mantra & Campfire Japa at North Santiam",
     location: "North Santiam River, OR",
     mile: 2005.2,
     soboMile: 144.8,
@@ -161,10 +156,10 @@ Through a break in the canopy, Mount Hood looms white and massive. It feels impo
     ],
     kirtan: {
       streamUrl: "kirtan-santiam-stream",
-      artist: "DAM & Trail Sangha",
-      mantra: "Hare Krishna Hare Krishna Krishna Krishna Hare Hare\nHare Rama Hare Rama Rama Rama Hare Hare\n\nRadhe Govinda Radhe Gopal\nShri Krishna Govinda Hare Murare",
-      translation: "O Lord, O Energy of the Lord, please engage me in Your devotional service. O protector of cows, O reservoir of all transcendental pleasure.",
-      ragaOrMood: "Bhairavi Evening Meditation · Acoustic drone by the running stream"
+      artist: "DAM & Trail Sangha (prabhupadabooks.com)",
+      mantra: "Hare Kṛṣṇa, Hare Kṛṣṇa, Kṛṣṇa Kṛṣṇa, Hare Hare\nHare Rāma, Hare Rāma, Rāma Rāma, Hare Hare",
+      translation: "O all-attractive Supreme Lord, O spiritual energy of the Lord (Harā), please engage me in Your transcendental loving service.",
+      ragaOrMood: "Evening Japa Meditation · Acoustic drone by the running mountain stream"
     }
   },
   {
@@ -179,13 +174,10 @@ Through a break in the canopy, Mount Hood looms white and massive. It feels impo
     section: "oregon",
     elevationFt: 6200,
     category: "milestone",
-    quote: "The whole mountain is razor-sharp black mirror. Every step sounds like broken china.",
     photos: [
       { src: "photos/canopy.jpg", alt: "Obsidian flakes glistening along the rocky trail" }
     ],
-    body: `Tens of thousands of years ago, a rhyolite lava flow cooled so quickly the silica formed natural volcanic glass instead of crystalline rock.
-
-Today the trail climbs right through the black flows. Black razor fragments chime beneath the Vibram soles of my Altras like stepping on shattered cathedral stained glass.`
+    body: "The entire mountain is razor-sharp black volcanic mirror. Every step chimes beneath the Vibram soles like walking across shattered cathedral stained glass."
   },
   {
     id: "crater-lake-voice",
@@ -261,7 +253,7 @@ Today the trail climbs right through the black flows. Black razor fragments chim
     date: "2026-10-04",
     dayNumber: 52,
     type: "scripture",
-    title: "Steadiness in the Storm Under Granite Spires",
+    title: "Unshakable Like the Ocean Amidst the Storm",
     location: "Castle Crags Granite Ridge, CA",
     mile: 1500.0,
     soboMile: 650.0,
@@ -272,11 +264,11 @@ Today the trail climbs right through the black flows. Black razor fragments chim
       { src: "photos/mt-hood.jpg", alt: "Sheer granite towers of Castle Crags rising dramatically against thunderheads" }
     ],
     scripture: {
-      source: "Bhagavad Gita",
+      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
       citation: "Chapter 2, Verse 70",
       transliteration: "āpūryamāṇam acala-pratiṣṭhaṁ samudram āpaḥ praviśanti yadvat / tadvat kāmā yaṁ praviśanti sarve sa śāntim āpnoti na kāma-kāmī",
       translation: "A person who is not disturbed by the incessant flow of desires — that enter like rivers into the ocean, which is ever being filled but is always still — can alone achieve peace, and not the man who strives to satisfy such desires.",
-      purport: "Watching storm clouds swirl around the 6,000-foot granite horn of Castle Dome. Rain lashed the tent for four hours, but the bedrock beneath never trembled. The verse teaches that true peace is not the absence of external storms, but internal anchor in the unmoving consciousness."
+      purport: "Śrīla Prabhupāda explains: 'Although the vast ocean is always filled with water, it is continually being filled by rivers, yet the ocean remains steady; it is not agitated. Similarly, a person fixed in Kṛṣṇa consciousness is never agitated by desires.' Watching storm clouds swirl around the 6,000-foot granite horn of Castle Dome, the rock stands steady and unmoved."
     }
   },
   {
@@ -318,13 +310,10 @@ Today the trail climbs right through the black flows. Black razor fragments chim
     section: "sierra",
     elevationFt: 8100,
     category: "campsite",
-    quote: "Desolation is a misnomer. There are a thousand tiny granite archipelagos here, each with its own dwarf juniper.",
     photos: [
       { src: "photos/river-dusk.jpg", alt: "Glacial lake with dozens of white granite islands under clear sky" }
     ],
-    body: `The trail here is pure white granodiorite scoured smooth by Pleistocene ice sheets.
-
-At sunset, the lake becomes a shallow basin of molten copper. I pitch the tent on a flat slab of granite anchored by four heavy stones instead of stakes, watching the reflection of Pyramid Peak turn violet in the freezing air.`
+    body: "Desolation is a misnomer. There are a thousand tiny white granite archipelagos here, each holding its own solitary dwarf juniper against the sky."
   },
   {
     id: "thousand-island-kirtan",
@@ -343,10 +332,10 @@ At sunset, the lake becomes a shallow basin of molten copper. I pitch the tent o
     ],
     kirtan: {
       streamUrl: "thousand-island-dawn",
-      artist: "DAM & Mountain Solitude",
-      mantra: "Hare Krishna Hare Krishna Krishna Krishna Hare Hare\nHare Rama Hare Rama Rama Rama Hare Hare",
+      artist: "DAM & Mountain Solitude (prabhupadabooks.com)",
+      mantra: "Hare Kṛṣṇa, Hare Kṛṣṇa, Kṛṣṇa Kṛṣṇa, Hare Hare\nHare Rāma, Hare Rāma, Rāma Rāma, Hare Hare",
       translation: "O all-attractive Supreme Lord, O spiritual energy of devotion, please connect me in loving service to all living beings.",
-      ragaOrMood: "Raga Bhupali · Morning stillness at 9,800 ft as the first pink alpenglow touches Banner Peak"
+      ragaOrMood: "Rāga Bhūpālī · Morning stillness at 9,800 ft as the first pink alpenglow touches Banner Peak"
     }
   },
   {
@@ -354,7 +343,7 @@ At sunset, the lake becomes a shallow basin of molten copper. I pitch the tent o
     date: "2026-10-24",
     dayNumber: 72,
     type: "scripture",
-    title: "Duty Without Attachment at Muir Pass Hut",
+    title: "Duty Without Attachment to the Fruits",
     location: "Muir Pass Stone Shelter, CA",
     mile: 838.0,
     soboMile: 1312.0,
@@ -365,11 +354,11 @@ At sunset, the lake becomes a shallow basin of molten copper. I pitch the tent o
       { src: "photos/trail-post.jpg", alt: "Historic stone dome hut built by the Sierra Club at nearly 12,000 feet" }
     ],
     scripture: {
-      source: "Bhagavad Gita",
+      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
       citation: "Chapter 2, Verse 47",
       transliteration: "karmaṇy evādhikāras te mā phaleṣu kadācana / mā karma-phala-hetur bhūr mā te saṅgo 'stvakarmaṇi",
       translation: "You have a right to perform your prescribed duty, but you are not entitled to the fruits of action. Never consider yourself the cause of the results of your activities, and never be attached to not doing your duty.",
-      purport: "Climbing through frozen talus up to 12,000 feet in freezing sleet. If you hike for the 'reward' of comfort, you will quit in twenty minutes. When you hike simply as pure duty — step following step without resentment or expectation — the stone shelter appears like a palace built by grace."
+      purport: "Śrīla Prabhupāda purports: 'The Lord advised that Arjuna should perform his prescribed duty without attachment to the result. One who is attached to the result of his work is also the cause of the action.' Climbing through freezing sleet at 12,000 feet, step follows step as pure prescribed duty without resentment or material expectation."
     }
   },
   {
@@ -432,13 +421,10 @@ At sunset, the lake becomes a shallow basin of molten copper. I pitch the tent o
     section: "socal",
     elevationFt: 4100,
     category: "reflection",
-    quote: "Giant three-bladed white monoliths sweeping the sky with a low, deep aerodynamic thrum.",
     photos: [
       { src: "photos/canopy.jpg", alt: "Endless rows of giant white wind turbines spanning golden desert hills" }
     ],
-    body: `Walking out of the high mountains and into the Mojave borderlands is a shock to the senses.
-
-The wind here blows a relentless 40 miles per hour. Hundreds of wind turbines stand like guardian giants on the ridges, their carbon fiber blades spinning in synchronized harmony, generating clean power while we grind out desert miles.`
+    body: "Giant three-bladed white monoliths sweeping the desert sky with a low, deep aerodynamic thrum that vibrates straight through the trekking poles."
   },
   {
     id: "la-aqueduct-stats",
@@ -479,20 +465,17 @@ The wind here blows a relentless 40 miles per hour. Hundreds of wind turbines st
     section: "socal",
     elevationFt: 2600,
     category: "milestone",
-    quote: "Sharply angled yellow slabs thrusting 150 feet out of the desert floor.",
     photos: [
       { src: "photos/town-waterfront.jpg", alt: "Dramatic jagged sandstone formations angled toward the sky" }
     ],
-    body: `These geologic rock formations were created by the San Andreas Fault Zone over 25 million years of tectonic compression.
-
-Walking through the narrow sand washes between the tilted slabs feels like wandering through the set of an ancient sci-fi film. The desert sun is warm on the shoulders.`
+    body: "Sharply angled yellow sandstone slabs thrusting 150 feet out of the Mojave floor, carved by 25 million years of tectonic faulting."
   },
   {
-    id: "mount-laguna-kirtan",
+    id: "mount-laguna-scripture",
     date: "2026-11-22",
     dayNumber: 101,
-    type: "kirtan",
-    title: "Pacific Ocean Horizon & Gratitude Kirtan",
+    type: "scripture",
+    title: "Carrying What They Lack & Preserving What They Have",
     location: "Mount Laguna Pine Ridge, CA",
     mile: 42.0,
     soboMile: 2108.0,
@@ -502,12 +485,12 @@ Walking through the narrow sand washes between the tilted slabs feels like wande
     photos: [
       { src: "photos/river-dusk.jpg", alt: "Golden sunset over the coastal mountains looking toward the Pacific" }
     ],
-    kirtan: {
-      streamUrl: "laguna-sunset-stream",
-      artist: "DAM & The Open Sky",
-      mantra: "Govinda Jaya Jaya Gopala Jaya Jaya\nRadha Ramana Hari Govinda Jaya Jaya\n\nHare Krishna Hare Krishna Krishna Krishna Hare Hare\nHare Rama Hare Rama Rama Rama Hare Hare",
-      translation: "All glories to Govinda, the giver of pleasure! All glories to Gopala, the protector of all souls!",
-      ragaOrMood: "Raga Yaman Sunset Chant · Pine scent and Pacific ocean sea breeze 40 miles from the Mexican border"
+    scripture: {
+      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
+      citation: "Chapter 9, Verse 22",
+      transliteration: "ananyāś cintayanto māṁ ye janāḥ paryupāsate / teṣāṁ nityābhiyuktānāṁ yoga-kṣemaṁ vahāmy aham",
+      translation: "But those who always worship Me with exclusive devotion, meditating on My transcendental form — to them I carry what they lack, and I preserve what they have.",
+      purport: "Śrīla Prabhupāda purports: 'The Lord helps such a devotee to achieve Kṛṣṇa consciousness by yoga, and when he becomes fully situated, the Lord protects him from falling down (kṣema).' Standing 40 miles from the Mexican border with the Pacific shimmering on the western horizon, you realize you were never walking alone."
     }
   },
   {
@@ -522,15 +505,10 @@ Walking through the narrow sand washes between the tilted slabs feels like wande
     section: "socal",
     elevationFt: 2900,
     category: "milestone",
-    quote: "The border fence stands tall in the desert sun. 2,150 miles from the Bridge of the Gods, the southbound journey rests.",
     photos: [
       { src: "photos/bridge-gods.jpg", alt: "The wooden five-column Southern Terminus monument at the border wall" },
       { src: "photos/trail-post.jpg", alt: "Daniel's hands resting on the final wooden monument marker" }
     ],
-    body: `One hundred and four days ago, I stepped off the metal grating of the Bridge of the Gods into Oregon.
-
-Through the rain of the Columbia Gorge, the volcanic fields of the Three Sisters, the granite spires of the High Sierra at 13,200 feet, and the long Mojave night hikes — every single step brought me to this wooden monument.
-
-I place both hands against the cedar post, close my eyes, and say a prayer of profound gratitude for the trail, the mountains, and the strength that carried me.`
+    body: "2,150 miles from the Bridge of the Gods, both hands rest against the cedar monument at the border wall. The southbound journey rests."
   }
 ];

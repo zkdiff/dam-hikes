@@ -341,13 +341,9 @@ export class AuthorScreen {
         </div>
 
         <div class="form-field">
-          <label for="compose-quote">Lead Pull Quote / Epigraph</label>
-          <textarea id="compose-quote" rows="2" placeholder="e.g. Hood is the first mountain I have to walk around..." style="font-family: var(--font-display); font-size: 15px; font-style: italic;">${quote}</textarea>
-        </div>
-
-        <div class="form-field">
-          <label for="compose-body">Journal Prose Narrative</label>
-          <textarea id="compose-body" rows="6" required placeholder="Write your full long-form narrative or poem...">${body}</textarea>
+          <label for="compose-body"><strong>Direct Observation / Words</strong></label>
+          <textarea id="compose-body" rows="3" required placeholder="e.g. Hood is the first mountain I have to walk around. After that the trail is a long green cathedral." style="font-family: var(--font-display); font-size: 15.5px; font-style: italic;">${body || quote}</textarea>
+          <small style="color: var(--color-muted); font-size: 11.5px; margin-top: 4px; display: block;">Keep entries direct, evocative, and punchy (1–3 sentences).</small>
         </div>
 
         <div class="form-field">
@@ -408,14 +404,19 @@ export class AuthorScreen {
     } else if (this.currentType === 'scripture') {
       formTypeHtml = `
         <div class="form-field">
-          <label for="compose-title">Contemplation / Reading Title</label>
-          <input id="compose-title" required placeholder="e.g. Trance by Intelligence Under Mount Jefferson" maxlength="80" value="${title}" />
+          <label for="compose-title">Contemplation Title</label>
+          <input id="compose-title" required placeholder="e.g. Step by Step with Fixed Conviction" maxlength="80" value="${title}" />
         </div>
 
         <div class="form-grid-2">
           <div class="form-field">
-            <label for="compose-scripture-source">Scripture / Tradition</label>
-            <input id="compose-scripture-source" placeholder="e.g. Bhagavad Gita" value="${s.source || 'Bhagavad Gita'}" required />
+            <label for="compose-scripture-source">Source (prabhupadabooks.com)</label>
+            <select id="compose-scripture-source" style="padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-fg); font-size: 13px;">
+              <option value="Bhagavad-gītā As It Is (prabhupadabooks.com)" ${s.source?.includes('Bhagavad') ? 'selected' : ''}>Bhagavad-gītā As It Is</option>
+              <option value="Śrī Īśopaniṣad (prabhupadabooks.com)" ${s.source?.includes('Īśopaniṣad') ? 'selected' : ''}>Śrī Īśopaniṣad</option>
+              <option value="Śrīmad-Bhāgavatam (prabhupadabooks.com)" ${s.source?.includes('Bhāgavatam') ? 'selected' : ''}>Śrīmad-Bhāgavatam</option>
+              <option value="Śrī Caitanya-caritāmṛta (prabhupadabooks.com)" ${s.source?.includes('Caitanya') ? 'selected' : ''}>Śrī Caitanya-caritāmṛta</option>
+            </select>
           </div>
           <div class="form-field">
             <label for="compose-scripture-citation">Chapter & Verse</label>
@@ -429,13 +430,13 @@ export class AuthorScreen {
         </div>
 
         <div class="form-field">
-          <label for="compose-scripture-translation"><strong>English Translation</strong></label>
+          <label for="compose-scripture-translation"><strong>English Translation (Śrīla Prabhupāda)</strong></label>
           <textarea id="compose-scripture-translation" rows="3" required placeholder="e.g. Gradually, step by step, one should become situated in trance...">${s.translation || ''}</textarea>
         </div>
 
         <div class="form-field">
-          <label for="compose-scripture-purport"><strong>Trail Realization & Purport</strong></label>
-          <textarea id="compose-scripture-purport" rows="4" required placeholder="Reflect on how this verse applies to the trail journey, discipline, and consciousness...">${s.purport || ''}</textarea>
+          <label for="compose-scripture-purport"><strong>Śrīla Prabhupāda Purport & Trail Realization</strong></label>
+          <textarea id="compose-scripture-purport" rows="4" required placeholder="Purport commentary and how this verse applies to the trail discipline...">${s.purport || ''}</textarea>
         </div>
       `;
 
