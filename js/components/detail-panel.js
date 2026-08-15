@@ -1,6 +1,6 @@
 /**
- * DAM HIKES - Adaptive TrailCard Component
- * Supports Rich Story, Minimalist Reflection, and Field Log formats
+ * DAM HIKES - Clean, Minimalist TrailCard Component
+ * Uncluttered collapsed state; structured stats placed in dedicated expanded footer.
  */
 
 import { elevationAtMile, formatElevation, formatMiles } from '../data/pct-route.js';
@@ -71,7 +71,6 @@ export class DetailPanel {
     const photos = entry.photos || [];
     const one = photos.length <= 1;
     const metrics = entry.metrics || {};
-    const layout = entry.layoutStyle || 'story';
 
     // 1. Photos Carousel
     let photoHtml = '';
@@ -79,7 +78,7 @@ export class DetailPanel {
       if (one) {
         photoHtml = `
           <div class="trail-card-photo-wrapper">
-            <button type="button" class="carousel-slide-btn" id="single-photo-btn">
+            <button type="button" class="carousel-slide-btn" id="single-photo-btn" aria-label="View photo in fullscreen">
               <img src="${photos[0].src}" alt="${photos[0].alt || entry.title}" class="carousel-slide-img" />
             </button>
           </div>
@@ -89,7 +88,7 @@ export class DetailPanel {
           <div class="trail-card-photo-wrapper">
             <div class="photo-carousel-track" id="photo-carousel-track">
               ${photos.map((p, idx) => `
-                <button type="button" class="carousel-slide-btn" data-index="${idx}">
+                <button type="button" class="carousel-slide-btn" data-index="${idx}" aria-label="View photo ${idx + 1} in fullscreen">
                   <img src="${p.src}" alt="${p.alt || entry.title}" class="carousel-slide-img" />
                 </button>
               `).join('')}
@@ -104,96 +103,15 @@ export class DetailPanel {
       }
     }
 
-    // 2. Format Body Content based on layout style
-    let bodyContentHtml = '';
+    // 2. Structured Stats Section (Only rendered when expanded)
+    let statsSectionHtml = '';
+    if (this.expanded) {
+      const hasMetrics = metrics.tempF || metrics.condition || metrics.waterSource || metrics.packWeightLbs || metrics.dayMileage || metrics.gearNotes;
 
-    if (layout === 'fieldlog') {
-      bodyContentHtml = `
-        <div class="fieldlog-grid" style="margin-top: 10px;">
-          <div class="field-cell">
-            <div class="field-label">Weather / Temp</div>
-            <div class="field-value">${metrics.tempF ? metrics.tempF + '°F' : '—'} · ${metrics.condition || 'Clear'}</div>
-          </div>
-          <div class="field-cell">
-            <div class="field-label">Water Status</div>
-            <div class="field-value">${metrics.waterSource || 'Stream on trail'}</div>
-          </div>
-          <div class="field-cell">
-            <div class="field-label">Pack Weight</div>
-            <div class="field-value">${metrics.packWeightLbs ? metrics.packWeightLbs + ' lbs' : 'Base'}</div>
-          </div>
-          <div class="field-cell">
-            <div class="field-label">Daily Miles</div>
-            <div class="field-value">${metrics.dayMileage ? metrics.dayMileage + ' mi' : '—'}</div>
-          </div>
-        </div>
-
-        <div class="${this.expanded ? 'trail-body-expanded' : 'trail-excerpt'}">
-          ${entry.body.replace(/\n\n/g, '<br/><br/>')}
-        </div>
-
-        ${metrics.gearNotes ? `
-          <div class="fieldlog-gear-notes" style="margin-top: 8px;">
-            <strong>⚙️ Field Notes:</strong> ${metrics.gearNotes}
-          </div>
-        ` : ''}
-      `;
-    } else if (layout === 'minimal') {
-      bodyContentHtml = `
-        ${entry.quote ? `
-          <blockquote class="minimal-lead-quote" style="margin-top: 8px;">
-            “${entry.quote}”
-          </blockquote>
-        ` : ''}
-
-        <div class="${this.expanded ? 'trail-body-expanded' : 'trail-excerpt'}">
-          ${entry.body.replace(/\n\n/g, '<br/><br/>')}
-        </div>
-      `;
-    } else {
-      // Default: Story layout
-      let metricRibbonHtml = '';
-      if (metrics.tempF || metrics.condition || metrics.waterSource || metrics.packWeightLbs) {
-        metricRibbonHtml = `
-          <div class="metric-ribbon" style="margin-top: 6px;">
-            ${metrics.tempF ? `<div class="metric-pill">🌡️ <span>${metrics.tempF}°F</span></div>` : ''}
-            ${metrics.condition ? `<div class="metric-pill">🌤️ <span>${metrics.condition}</span></div>` : ''}
-            ${metrics.waterSource ? `<div class="metric-pill">💧 <span>${metrics.waterSource}</span></div>` : ''}
-            ${metrics.packWeightLbs ? `<div class="metric-pill">🎒 <span>${metrics.packWeightLbs} lbs</span></div>` : ''}
-            ${metrics.dayMileage ? `<div class="metric-pill">🥾 <span>${metrics.dayMileage} mi</span></div>` : ''}
-          </div>
-        `;
-      }
-
-      bodyContentHtml = `
-        ${entry.quote ? `
-          <blockquote class="detail-pull-quote" style="margin-top: 8px;">
-            "${entry.quote}"
-          </blockquote>
-        ` : ''}
-
-        ${metricRibbonHtml}
-
-        <div class="${this.expanded ? 'trail-body-expanded' : 'trail-excerpt'}">
-          ${entry.body.replace(/\n\n/g, '<br/><br/>')}
-        </div>
-
-        ${metrics.gearNotes ? `
-          <div class="fieldlog-gear-notes" style="margin-top: 8px;">
-            <strong>⚙️ Gear & Resupply:</strong> ${metrics.gearNotes}
-          </div>
-        ` : ''}
-      `;
-    }
-
-    container.innerHTML = `
-      <article class="trail-card-article ${this.expanded ? 'is-expanded' : ''}">
-        ${photoHtml}
-
-        <div class="trail-card-content">
-          <!-- Top Badges & Meta Row -->
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;">
-            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+      statsSectionHtml = `
+        <div class="card-expanded-stats-box">
+          <div class="stats-box-header">
+            <div class="stats-badge-group">
               <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">
                 ${CATEGORY_NAMES[entry.category] || '📍 Moment'}
               </span>
@@ -203,19 +121,75 @@ export class DetailPanel {
             </div>
             
             <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry" title="Edit this entry in composer">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               <span>Edit</span>
             </button>
           </div>
 
+          ${hasMetrics ? `
+            <div class="fieldlog-grid">
+              <div class="field-cell">
+                <div class="field-label">Weather / Temp</div>
+                <div class="field-value">${metrics.tempF ? metrics.tempF + '°F' : '—'}${metrics.condition ? ` · ${metrics.condition}` : ''}</div>
+              </div>
+              <div class="field-cell">
+                <div class="field-label">Water Status</div>
+                <div class="field-value">${metrics.waterSource || 'Stream on trail'}</div>
+              </div>
+              <div class="field-cell">
+                <div class="field-label">Pack Weight</div>
+                <div class="field-value">${metrics.packWeightLbs ? metrics.packWeightLbs + ' lbs' : '11.4 lb base'}</div>
+              </div>
+              <div class="field-cell">
+                <div class="field-label">Daily Miles</div>
+                <div class="field-value">${metrics.dayMileage ? metrics.dayMileage + ' mi' : '—'}</div>
+              </div>
+            </div>
+          ` : ''}
+
+          ${metrics.gearNotes ? `
+            <div class="fieldlog-gear-notes">
+              <strong>⚙️ Field & Gear Notes:</strong> ${metrics.gearNotes}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // 3. Body Content
+    const bodyText = entry.body ? entry.body.replace(/\n\n/g, '<br/><br/>') : '';
+
+    container.innerHTML = `
+      <article class="trail-card-article ${this.expanded ? 'is-expanded' : ''}">
+        ${photoHtml}
+
+        <div class="trail-card-content">
+          <!-- Clean Meta Stamp -->
           <p class="card-meta-stamp">
             ${formatFeedDate(entry.date)} · ${entry.location} · mi ${formatMiles(entry.mile)} · ${formatElevation(elev.elevFt)}
           </p>
 
+          <!-- Title & Story -->
           <button type="button" class="card-title-toggle-btn" id="btn-toggle-expand">
             <h2 class="card-heading">${entry.title}</h2>
-            ${bodyContentHtml}
-            ${!this.expanded ? '<span class="card-read-more-hint">More</span>' : '<span class="card-read-more-hint">Less</span>'}
+            
+            ${this.expanded ? `
+              <div class="trail-body-expanded">
+                ${entry.quote ? `
+                  <blockquote class="detail-pull-quote">
+                    "${entry.quote}"
+                  </blockquote>
+                ` : ''}
+                <div class="trail-body-text">${bodyText}</div>
+                ${statsSectionHtml}
+              </div>
+            ` : `
+              <div class="trail-excerpt">
+                ${bodyText}
+              </div>
+            `}
+            
+            <span class="card-read-more-hint">${!this.expanded ? 'More' : 'Less'}</span>
           </button>
 
           <!-- Step Navigation Footer -->
@@ -239,7 +213,9 @@ export class DetailPanel {
 
   attachEvents(container, entry, photos) {
     // Expand / Collapse Toggle
-    container.querySelector('#btn-toggle-expand')?.addEventListener('click', () => {
+    container.querySelector('#btn-toggle-expand')?.addEventListener('click', (e) => {
+      // Don't toggle if clicking a button inside
+      if (e.target.closest('#btn-quick-edit-entry') || e.target.closest('a')) return;
       this.expanded = !this.expanded;
       this.render();
     });
@@ -252,7 +228,7 @@ export class DetailPanel {
       store.step(1);
     });
 
-    // Quick Edit Button
+    // Quick Edit Button (inside stats section)
     container.querySelector('#btn-quick-edit-entry')?.addEventListener('click', (e) => {
       e.stopPropagation();
       store.setSheet('compose', entry.id);

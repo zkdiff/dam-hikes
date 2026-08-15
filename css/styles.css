@@ -408,6 +408,28 @@ button:disabled {
 .badge-cat-hardship { background: rgba(239, 68, 68, 0.18); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.35); }
 .badge-cat-reflection { background: rgba(236, 72, 153, 0.18); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.35); }
 
+.card-expanded-stats-box {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: rgba(18, 20, 16, 0.65);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.stats-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.stats-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .btn-card-edit-quick {
   display: inline-flex;
   align-items: center;
