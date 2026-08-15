@@ -8,6 +8,7 @@ import { DetailPanel } from './components/detail-panel.js';
 import { ElevationProfile } from './components/elevation-profile.js';
 import { OverviewScreen } from './components/overview-screen.js';
 import { AuthorScreen } from './components/author-screen.js';
+import { TimelineDrawer } from './components/timeline-drawer.js';
 import { milesWalked, daysOnTrail, hasStarted, formatMiles } from './data/pct-route.js';
 
 class App {
@@ -17,6 +18,7 @@ class App {
     this.elevationProfile = null;
     this.overviewScreen = null;
     this.authorScreen = null;
+    this.timelineDrawer = null;
   }
 
   init() {
@@ -29,12 +31,14 @@ class App {
     this.elevationProfile = new ElevationProfile('elevation-profile-container');
     this.overviewScreen = new OverviewScreen('sheet-about-content');
     this.authorScreen = new AuthorScreen('sheet-compose-content');
+    this.timelineDrawer = new TimelineDrawer('sheet-timeline-content');
 
     this.map.init();
     this.detailPanel.init();
     this.elevationProfile.init();
     this.overviewScreen.init();
     this.authorScreen.init();
+    this.timelineDrawer.init();
 
     // 3. Bind UI Elements
     this.setupHeader();
@@ -45,15 +49,19 @@ class App {
 
     // 4. Subscribe to State Changes
     store.subscribe((s, eventType) => {
-      if (['select_change', 'entry_added'].includes(eventType)) {
+      if (['select_change', 'entry_added', 'entry_updated', 'entry_deleted', 'filter_change'].includes(eventType)) {
         this.updateHeaderStats();
       }
     });
 
-    console.log('🌲 DAM Hikes (Prototype Aesthetic) initialized.');
+    console.log('🌲 DAM Hikes (Prototype Aesthetic + Full Functionality) initialized.');
   }
 
   setupHeader() {
+    document.getElementById('btn-open-timeline')?.addEventListener('click', () => {
+      store.setSheet('timeline');
+    });
+
     document.getElementById('btn-open-about')?.addEventListener('click', () => {
       store.setSheet('about');
     });
@@ -79,16 +87,20 @@ class App {
 
     if (locEl) locEl.textContent = selected.location;
     if (mileEl) mileEl.textContent = formatMiles(selected.mile);
-    if (dayEl) dayEl.textContent = started ? `day ${days}` : 'starts tomorrow';
+    if (dayEl) dayEl.textContent = started ? `Day ${selected.dayNumber || days}` : 'Starts tomorrow';
     if (walkedEl) walkedEl.textContent = formatMiles(walked);
     if (remEl) remEl.textContent = formatMiles(selected.mile);
   }
 
   setupSheets() {
+    const sheetTimeline = document.getElementById('sheet-timeline');
     const sheetAbout = document.getElementById('sheet-about');
     const sheetCompose = document.getElementById('sheet-compose');
 
     const updateSheets = () => {
+      if (sheetTimeline) {
+        sheetTimeline.classList.toggle('open', store.sheet === 'timeline');
+      }
       if (sheetAbout) {
         sheetAbout.classList.toggle('open', store.sheet === 'about');
       }
@@ -98,12 +110,15 @@ class App {
     };
 
     store.subscribe((s, eventType) => {
-      if (eventType === 'sheet_change' || eventType === 'entry_added') {
+      if (eventType === 'sheet_change' || eventType === 'entry_added' || eventType === 'entry_updated') {
         updateSheets();
       }
     });
 
     // Close buttons & backdrops
+    document.getElementById('sheet-timeline-close')?.addEventListener('click', () => store.setSheet(null));
+    document.getElementById('sheet-timeline-backdrop')?.addEventListener('click', () => store.setSheet(null));
+
     document.getElementById('sheet-about-close')?.addEventListener('click', () => store.setSheet(null));
     document.getElementById('sheet-about-backdrop')?.addEventListener('click', () => store.setSheet(null));
 
@@ -143,6 +158,8 @@ class App {
         store.step(-1);
       } else if (e.key === 'ArrowRight') {
         store.step(1);
+      } else if (e.key === 't' || e.key === 'T') {
+        store.setSheet(store.sheet === 'timeline' ? null : 'timeline');
       } else if (e.key === 'Escape') {
         if (store.lightbox) {
           store.closeLightbox();

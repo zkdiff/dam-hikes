@@ -1,5 +1,6 @@
 /**
- * DAM HIKES - Trail Card Component (Active Moment Viewer)
+ * DAM HIKES - Adaptive TrailCard Component
+ * Supports Rich Story, Minimalist Reflection, and Field Log formats
  */
 
 import { elevationAtMile, formatElevation, formatMiles } from '../data/pct-route.js';
@@ -16,6 +17,22 @@ function formatFeedDate(isoStr) {
   }
 }
 
+const CATEGORY_NAMES = {
+  campsite: '⛺ Campsite',
+  milestone: '🏔️ Milestone / Pass',
+  resupply: '🍕 Resupply / Town',
+  wildlife: '🐻 Wildlife & Flora',
+  hardship: '⚡ Condition / Hazard',
+  reflection: '📖 Journal Reflection'
+};
+
+const SECTION_NAMES = {
+  oregon: 'Oregon',
+  norcal: 'Northern California',
+  sierra: 'High Sierra',
+  socal: 'Southern California'
+};
+
 export class DetailPanel {
   constructor(containerId) {
     this.containerId = containerId;
@@ -26,7 +43,7 @@ export class DetailPanel {
   init() {
     this.render();
     store.subscribe((s, eventType) => {
-      if (['select_change', 'entry_added'].includes(eventType)) {
+      if (['select_change', 'entry_added', 'entry_updated', 'entry_deleted', 'filter_change'].includes(eventType)) {
         this.photoIndex = 0;
         this.render();
       }
@@ -40,20 +57,23 @@ export class DetailPanel {
     const entry = store.getSelectedEntry();
     if (!entry) {
       container.innerHTML = `
-        <article class="trail-card-article" style="padding: 16px; text-align: center; color: var(--color-muted);">
-          No updates yet.
+        <article class="trail-card-article" style="padding: 24px 16px; text-align: center; color: var(--color-muted);">
+          No updates found matching current filters.
         </article>
       `;
       return;
     }
 
-    const ordered = store.getOrderedEntries();
-    const index = ordered.findIndex(e => e.id === entry.id);
-    const total = ordered.length;
+    const filtered = store.getFilteredEntries();
+    const index = filtered.findIndex(e => e.id === entry.id);
+    const total = filtered.length;
     const elev = elevationAtMile(entry.mile);
     const photos = entry.photos || [];
     const one = photos.length <= 1;
+    const metrics = entry.metrics || {};
+    const layout = entry.layoutStyle || 'story';
 
+    // 1. Photos Carousel
     let photoHtml = '';
     if (photos.length > 0) {
       if (one) {
@@ -84,23 +104,121 @@ export class DetailPanel {
       }
     }
 
+    // 2. Format Body Content based on layout style
+    let bodyContentHtml = '';
+
+    if (layout === 'fieldlog') {
+      bodyContentHtml = `
+        <div class="fieldlog-grid" style="margin-top: 10px;">
+          <div class="field-cell">
+            <div class="field-label">Weather / Temp</div>
+            <div class="field-value">${metrics.tempF ? metrics.tempF + '°F' : '—'} · ${metrics.condition || 'Clear'}</div>
+          </div>
+          <div class="field-cell">
+            <div class="field-label">Water Status</div>
+            <div class="field-value">${metrics.waterSource || 'Stream on trail'}</div>
+          </div>
+          <div class="field-cell">
+            <div class="field-label">Pack Weight</div>
+            <div class="field-value">${metrics.packWeightLbs ? metrics.packWeightLbs + ' lbs' : 'Base'}</div>
+          </div>
+          <div class="field-cell">
+            <div class="field-label">Daily Miles</div>
+            <div class="field-value">${metrics.dayMileage ? metrics.dayMileage + ' mi' : '—'}</div>
+          </div>
+        </div>
+
+        <div class="${this.expanded ? 'trail-body-expanded' : 'trail-excerpt'}">
+          ${entry.body.replace(/\n\n/g, '<br/><br/>')}
+        </div>
+
+        ${metrics.gearNotes ? `
+          <div class="fieldlog-gear-notes" style="margin-top: 8px;">
+            <strong>⚙️ Field Notes:</strong> ${metrics.gearNotes}
+          </div>
+        ` : ''}
+      `;
+    } else if (layout === 'minimal') {
+      bodyContentHtml = `
+        ${entry.quote ? `
+          <blockquote class="minimal-lead-quote" style="margin-top: 8px;">
+            “${entry.quote}”
+          </blockquote>
+        ` : ''}
+
+        <div class="${this.expanded ? 'trail-body-expanded' : 'trail-excerpt'}">
+          ${entry.body.replace(/\n\n/g, '<br/><br/>')}
+        </div>
+      `;
+    } else {
+      // Default: Story layout
+      let metricRibbonHtml = '';
+      if (metrics.tempF || metrics.condition || metrics.waterSource || metrics.packWeightLbs) {
+        metricRibbonHtml = `
+          <div class="metric-ribbon" style="margin-top: 6px;">
+            ${metrics.tempF ? `<div class="metric-pill">🌡️ <span>${metrics.tempF}°F</span></div>` : ''}
+            ${metrics.condition ? `<div class="metric-pill">🌤️ <span>${metrics.condition}</span></div>` : ''}
+            ${metrics.waterSource ? `<div class="metric-pill">💧 <span>${metrics.waterSource}</span></div>` : ''}
+            ${metrics.packWeightLbs ? `<div class="metric-pill">🎒 <span>${metrics.packWeightLbs} lbs</span></div>` : ''}
+            ${metrics.dayMileage ? `<div class="metric-pill">🥾 <span>${metrics.dayMileage} mi</span></div>` : ''}
+          </div>
+        `;
+      }
+
+      bodyContentHtml = `
+        ${entry.quote ? `
+          <blockquote class="detail-pull-quote" style="margin-top: 8px;">
+            "${entry.quote}"
+          </blockquote>
+        ` : ''}
+
+        ${metricRibbonHtml}
+
+        <div class="${this.expanded ? 'trail-body-expanded' : 'trail-excerpt'}">
+          ${entry.body.replace(/\n\n/g, '<br/><br/>')}
+        </div>
+
+        ${metrics.gearNotes ? `
+          <div class="fieldlog-gear-notes" style="margin-top: 8px;">
+            <strong>⚙️ Gear & Resupply:</strong> ${metrics.gearNotes}
+          </div>
+        ` : ''}
+      `;
+    }
+
     container.innerHTML = `
       <article class="trail-card-article ${this.expanded ? 'is-expanded' : ''}">
         ${photoHtml}
 
         <div class="trail-card-content">
+          <!-- Top Badges & Meta Row -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span class="badge badge-category badge-cat-${entry.category || 'reflection'}">
+                ${CATEGORY_NAMES[entry.category] || '📍 Moment'}
+              </span>
+              <span class="badge badge-section">
+                ${SECTION_NAMES[entry.section] || 'PCT'}
+              </span>
+            </div>
+            
+            <button type="button" class="btn-card-edit-quick" id="btn-quick-edit-entry" title="Edit this entry in composer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Edit</span>
+            </button>
+          </div>
+
           <p class="card-meta-stamp">
             ${formatFeedDate(entry.date)} · ${entry.location} · mi ${formatMiles(entry.mile)} · ${formatElevation(elev.elevFt)}
           </p>
 
           <button type="button" class="card-title-toggle-btn" id="btn-toggle-expand">
             <h2 class="card-heading">${entry.title}</h2>
-            <div class="${this.expanded ? 'trail-body-expanded' : 'trail-excerpt'}">
-              ${entry.body.replace(/\n\n/g, '<br/><br/>')}
-            </div>
-            ${!this.expanded ? '<span class="card-read-more-hint">More</span>' : ''}
+            ${bodyContentHtml}
+            ${!this.expanded ? '<span class="card-read-more-hint">More</span>' : '<span class="card-read-more-hint">Less</span>'}
           </button>
 
+          <!-- Step Navigation Footer -->
           <div class="trail-card-footer-nav">
             <button type="button" class="btn-step-arrow" id="btn-card-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on the trail">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -132,6 +250,12 @@ export class DetailPanel {
     });
     container.querySelector('#btn-card-next')?.addEventListener('click', () => {
       store.step(1);
+    });
+
+    // Quick Edit Button
+    container.querySelector('#btn-quick-edit-entry')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      store.setSheet('compose', entry.id);
     });
 
     // Single Photo Lightbox

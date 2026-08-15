@@ -1,5 +1,5 @@
 /**
- * DAM HIKES - Leaflet Satellite Map & Trail Beads Renderer
+ * DAM HIKES - Leaflet Satellite Map & Category-Aware Trail Beads Renderer
  */
 
 import { PCT_WAYPOINTS, splitRoute, positionAtMile, placeEntriesOnTrail } from './data/pct-route.js';
@@ -14,20 +14,46 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+const CATEGORY_COLORS = {
+  campsite: '#10B981',
+  milestone: '#3B82F6',
+  resupply: '#F59E0B',
+  wildlife: '#8B5CF6',
+  hardship: '#EF4444',
+  reflection: '#EC4899'
+};
+
+const CATEGORY_ICONS = {
+  campsite: '⛺',
+  milestone: '🏔️',
+  resupply: '🍕',
+  wildlife: '🐻',
+  hardship: '⚡',
+  reflection: '📖'
+};
+
 function createBeadIcon(entry, isSelected, isLatest) {
   const size = isSelected ? 48 : 32;
   const photo = entry.photos && entry.photos.length > 0 ? entry.photos[0] : null;
+  const color = CATEGORY_COLORS[entry.category] || '#c5d4a8';
+  const icon = CATEGORY_ICONS[entry.category] || '📍';
+
   const media = photo
     ? `<img src="${escapeHtml(photo.src)}" alt="" />`
-    : `<span>${escapeHtml(entry.title.slice(0, 1))}</span>`;
+    : `<span>${icon}</span>`;
   
   const label = isSelected
-    ? `<span class="trail-bead-label">${escapeHtml(entry.title)}</span>`
+    ? `<span class="trail-bead-label" style="border-color: ${color};">
+        <span style="color: ${color}; margin-right: 4px;">${icon}</span>
+        ${escapeHtml(entry.title)}
+       </span>`
     : '';
 
   const html = `
     <div class="trail-bead-wrap">
-      <div class="trail-bead ${isSelected ? 'is-selected' : ''} ${isLatest ? 'is-now' : ''}">${media}</div>
+      <div class="trail-bead ${isSelected ? 'is-selected' : ''} ${isLatest ? 'is-now' : ''}" style="--bead-color: ${color}; ${isSelected ? `border-color: ${color}; box-shadow: 0 0 0 4px ${color}55;` : ''}">
+        ${media}
+      </div>
       ${label}
     </div>
   `;
@@ -119,7 +145,7 @@ export class TrailMap {
 
     // Store Subscriptions
     store.subscribe((s, eventType) => {
-      if (['select_change', 'frame_change', 'entry_added'].includes(eventType)) {
+      if (['select_change', 'frame_change', 'entry_added', 'entry_updated', 'entry_deleted', 'filter_change'].includes(eventType)) {
         this.updateRoute();
         this.updateBeads();
         this.updateCamera();
@@ -157,7 +183,7 @@ export class TrailMap {
       L.marker([start.lat, start.lon], {
         icon: L.divIcon({
           className: 'trail-bead-icon',
-          html: `<div class="trail-terminus" title="Start"></div>`,
+          html: `<div class="trail-terminus" title="Cascade Locks Start"></div>`,
           iconSize: [12, 12],
           iconAnchor: [6, 6]
         }),
@@ -168,7 +194,7 @@ export class TrailMap {
     L.marker([end.lat, end.lon], {
       icon: L.divIcon({
         className: 'trail-bead-icon',
-        html: `<div class="trail-campo" title="Campo"></div>`,
+        html: `<div class="trail-campo" title="Campo Southern Terminus"></div>`,
         iconSize: [10, 10],
         iconAnchor: [5, 5]
       }),
@@ -193,12 +219,12 @@ export class TrailMap {
 
   updateBeads() {
     this.beadLayer.clearLayers();
-    const beads = placeEntriesOnTrail(store.entries);
-    const ordered = store.getOrderedEntries();
-    const latestId = ordered[ordered.length - 1]?.id;
+    const filteredEntries = store.getFilteredEntries();
+    const beads = placeEntriesOnTrail(filteredEntries);
+    const latestId = filteredEntries[filteredEntries.length - 1]?.id;
 
     for (const bead of beads) {
-      const entry = store.entries.find(e => e.id === bead.id);
+      const entry = filteredEntries.find(e => e.id === bead.id);
       if (!entry) continue;
 
       const isSelected = entry.id === store.selectedId;
@@ -255,7 +281,8 @@ export class TrailMap {
         this.map.fitBounds(bounds, { ...pad, maxZoom: 7 });
       }
     } else {
-      const beads = placeEntriesOnTrail(store.entries);
+      const filteredEntries = store.getFilteredEntries();
+      const beads = placeEntriesOnTrail(filteredEntries);
       const bead = store.frame === 'entry' && store.selectedId
         ? beads.find(item => item.id === store.selectedId)
         : null;

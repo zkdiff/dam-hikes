@@ -291,7 +291,7 @@ button:disabled {
   border-radius: 999px;
   background: var(--color-surface);
   box-shadow: 0 0 0 1px rgba(18, 20, 16, 0.45);
-  transition: width 0.2s cubic-bezier(0.22, 1, 0.36, 1), height 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease;
+  transition: width 0.2s cubic-bezier(0.22, 1, 0.36, 1), height 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .trail-bead img,
@@ -305,7 +305,6 @@ button:disabled {
 .trail-bead span {
   display: grid;
   place-items: center;
-  font-family: var(--font-display);
   font-size: 14px;
   color: var(--color-paper);
   background: var(--color-surface);
@@ -331,14 +330,16 @@ button:disabled {
   bottom: calc(100% + 6px);
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(18, 20, 16, 0.85);
+  background: rgba(18, 20, 16, 0.88);
   color: var(--color-paper);
   font-size: 11px;
   letter-spacing: 0.04em;
   white-space: nowrap;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(236, 231, 220, 0.12);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(236, 231, 220, 0.16);
   pointer-events: none;
+  display: flex;
+  align-items: center;
 }
 
 .trail-here {
@@ -379,6 +380,201 @@ button:disabled {
   0% { box-shadow: 0 0 0 4px rgba(197, 212, 168, 0.4); }
   70% { box-shadow: 0 0 0 14px rgba(197, 212, 168, 0); }
   100% { box-shadow: 0 0 0 4px rgba(197, 212, 168, 0); }
+}
+
+/* --- Badges & Category Accents --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge-section {
+  background: rgba(228, 220, 203, 0.1);
+  color: var(--color-paper);
+  border: 1px solid rgba(228, 220, 203, 0.15);
+}
+
+.badge-cat-campsite { background: rgba(16, 185, 129, 0.18); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.35); }
+.badge-cat-milestone { background: rgba(59, 130, 246, 0.18); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.35); }
+.badge-cat-resupply { background: rgba(245, 158, 11, 0.18); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35); }
+.badge-cat-wildlife { background: rgba(139, 92, 246, 0.18); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.35); }
+.badge-cat-hardship { background: rgba(239, 68, 68, 0.18); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+.badge-cat-reflection { background: rgba(236, 72, 153, 0.18); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.35); }
+
+.btn-card-edit-quick {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(228, 220, 203, 0.1);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.btn-card-edit-quick:hover {
+  background: rgba(228, 220, 203, 0.2);
+  color: var(--color-fg);
+}
+
+/* Quotes */
+.detail-pull-quote {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-trail);
+  border-left: 2px solid var(--color-trail);
+  padding-left: 10px;
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.minimal-lead-quote {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--color-paper);
+  border-left: 3px solid var(--color-primary);
+  padding-left: 12px;
+  margin: 10px 0 12px 0;
+}
+
+/* Metric Ribbon */
+.metric-ribbon {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 6px 0;
+}
+
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(18, 20, 16, 0.6);
+  border: 1px solid var(--color-border);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--color-muted);
+}
+.metric-pill span {
+  color: var(--color-fg);
+}
+
+/* Field Log Grid */
+.fieldlog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.field-cell {
+  background: rgba(18, 20, 16, 0.55);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.field-label {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.field-value {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--color-fg);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fieldlog-gear-notes {
+  background: rgba(228, 220, 203, 0.05);
+  border-left: 2px solid var(--color-muted);
+  padding: 6px 8px;
+  font-size: 12.5px;
+  color: var(--color-muted);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Timeline Drawer Pills */
+.pill-btn {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(18, 20, 16, 0.6);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.pill-btn.active {
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+  border-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.pill-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(18, 20, 16, 0.6);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 11.5px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.pill-category.active {
+  background: rgba(197, 212, 168, 0.2);
+  color: var(--color-trail);
+  border-color: var(--color-trail);
+  font-weight: 600;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.drawer-timeline-card:hover {
+  border-color: var(--color-trail) !important;
+  background: var(--color-raised) !important;
+}
+
+.btn-preset-thumb {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(228, 220, 203, 0.08);
+  border: 1px solid var(--color-border);
+  font-size: 11px;
+  color: var(--color-paper);
+}
+.btn-preset-thumb:hover {
+  background: rgba(228, 220, 203, 0.2);
 }
 
 /* --- Bottom Card Stack (Elevation + TrailCard) --- */
@@ -551,7 +747,7 @@ button:disabled {
 
 .card-heading {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--color-fg);
@@ -563,7 +759,7 @@ button:disabled {
   overflow: hidden;
   line-height: 1.5;
   margin-top: 6px;
-  font-size: 15px;
+  font-size: 14.5px;
   color: rgba(236, 231, 220, 0.9);
   white-space: normal;
 }
@@ -573,7 +769,7 @@ button:disabled {
   max-height: 28dvh;
   overflow-y: auto;
   white-space: pre-wrap;
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.65;
   color: rgba(236, 231, 220, 0.92);
 }
@@ -585,8 +781,9 @@ button:disabled {
 .card-read-more-hint {
   display: inline-block;
   margin-top: 4px;
-  font-size: 14px;
-  color: var(--color-muted);
+  font-size: 13.5px;
+  color: var(--color-trail);
+  font-weight: 500;
 }
 
 /* Step Navigation Footer */
@@ -648,7 +845,7 @@ button:disabled {
   z-index: 10;
   margin: 0 auto;
   width: 100%;
-  max-width: 540px;
+  max-width: 560px;
   display: flex;
   flex-direction: column;
   overflow: hidden;

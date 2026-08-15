@@ -1,6 +1,8 @@
 /**
- * DAM HIKES - About The Hike & Gear Breakdown Panel
+ * DAM HIKES - About The Hike, Hiker Bio, Gear List & Data Backup Panel
  */
+
+import { store } from '../state.js';
 
 export const GEAR = [
   {
@@ -123,29 +125,49 @@ export class OverviewScreen {
     const packOz = packWeightOz();
 
     container.innerHTML = `
-      <div>
+      <div style="padding-bottom: 24px;">
         <img src="photos/hiker-back.jpg" alt="Walking south into the Oregon woods" class="about-hero-img" />
         
         <div class="about-intro-text">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--color-fg);">Daniel Armando Martinez (DAM)</h3>
+            <span style="font-size: 11px; font-family: var(--font-mono); background: rgba(228, 220, 203, 0.1); padding: 2px 8px; border-radius: 4px; color: var(--color-paper);">SOBO 2026</span>
+          </div>
           <p>
             Walking the PCT south from Cascade Locks — mile 2150 — toward Campo.
             Start is 14 August 2026.
           </p>
           <p>
-            This feed is for family and friends. I post when I have a signal. If
-            a few days go quiet, I am between towns.
+            This feed is for family, friends, and the trail community. I post whenever I hit cell signal. If a few days go quiet, I am between mountain passes, not lost.
           </p>
         </div>
 
+        <!-- Key Stats Grid -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px;">
+          <div style="background: var(--color-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); text-align: center;">
+            <div style="font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--color-fg);">2,150</div>
+            <div style="font-size: 10px; text-transform: uppercase; color: var(--color-muted);">Total Miles</div>
+          </div>
+          <div style="background: var(--color-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); text-align: center;">
+            <div style="font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--color-trail);">13,200'</div>
+            <div style="font-size: 10px; text-transform: uppercase; color: var(--color-muted);">Forester Zenith</div>
+          </div>
+          <div style="background: var(--color-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--color-border); text-align: center;">
+            <div style="font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--color-fg);">420k+</div>
+            <div style="font-size: 10px; text-transform: uppercase; color: var(--color-muted);">Elevation Gain</div>
+          </div>
+        </div>
+
+        <!-- Gear Breakdown -->
         <div class="gear-header-row">
           <div>
             <p class="gear-base-label">Base weight</p>
-            <h3 class="gear-base-title">Gear</h3>
+            <h3 class="gear-base-title">Gear List</h3>
           </div>
           <p class="gear-base-weight">${ozToLb(packOz)}</p>
         </div>
         <p class="gear-subtitle-note">
-          Worn clothing is not counted. Food and water change every carry.
+          Worn clothing is not counted in base weight. Food and water change every carry.
         </p>
 
         <div class="gear-groups-stack">
@@ -172,7 +194,60 @@ export class OverviewScreen {
             `;
           }).join('')}
         </div>
+
+        <!-- Data Backup & Reset Actions -->
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border);">
+          <h4 style="font-family: var(--font-display); font-size: 16px; color: var(--color-fg); margin-bottom: 8px;">💾 Data Backup & Portability</h4>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" id="btn-export-journal-json" style="padding: 8px 12px; border-radius: 6px; background: var(--color-primary); color: var(--color-primary-fg); font-size: 13px; font-weight: 600;">
+              Export Journal (JSON)
+            </button>
+            <label style="padding: 8px 12px; border-radius: 6px; background: rgba(228, 220, 203, 0.1); border: 1px solid var(--color-border); color: var(--color-fg); font-size: 13px; font-weight: 600; cursor: pointer;">
+              Import Backup
+              <input type="file" id="input-import-journal-json" accept=".json" style="display: none;" />
+            </label>
+            <button type="button" id="btn-reset-journal-seed" style="padding: 8px 12px; border-radius: 6px; background: transparent; border: 1px solid #EF4444; color: #EF4444; font-size: 13px; font-weight: 600;">
+              Reset to 24 Moments
+            </button>
+          </div>
+        </div>
       </div>
     `;
+
+    this.attachEvents(container);
+  }
+
+  attachEvents(container) {
+    // Export JSON
+    container.querySelector('#btn-export-journal-json')?.addEventListener('click', () => {
+      store.exportJSON();
+    });
+
+    // Import JSON
+    container.querySelector('#input-import-journal-json')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const res = store.importJSON(event.target.result);
+          if (res.success) {
+            alert(`Imported ${res.count} trail moments!`);
+            store.setSheet(null);
+          } else {
+            alert('Import error: ' + res.error);
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    // Reset to Defaults
+    container.querySelector('#btn-reset-journal-seed')?.addEventListener('click', () => {
+      if (confirm('Reset journal to original 24 authentic trail moments?')) {
+        store.resetToDefaults();
+        alert('Reset complete!');
+        store.setSheet(null);
+      }
+    });
   }
 }

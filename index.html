@@ -41,9 +41,17 @@
         </div>
 
         <div class="header-actions-group">
+          <!-- Timeline Index & Filter Button -->
+          <button type="button" id="btn-open-timeline" class="btn-header-glass" aria-label="Browse timeline & filter moments" title="Timeline Index & Filter">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+
+          <!-- About & Gear List Button -->
           <button type="button" id="btn-open-about" class="btn-header-glass" aria-label="About the hike and gear list" title="Hiker Bio & Gear List">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </button>
+
+          <!-- New Update Compose Button -->
           <button type="button" id="btn-open-compose" class="btn-header-primary" aria-label="New update" title="New Journal Entry">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
@@ -80,6 +88,20 @@
 
   </div>
 
+  <!-- Slide-Up App Sheet: Timeline Index & Filter -->
+  <div id="sheet-timeline" class="app-sheet-modal" role="dialog" aria-modal="true" aria-label="Timeline Index & Filter">
+    <div class="app-sheet-backdrop" id="sheet-timeline-backdrop"></div>
+    <div class="app-sheet-dialog tall">
+      <header class="app-sheet-header">
+        <h2 class="app-sheet-title">Trail Timeline Index</h2>
+        <button type="button" class="app-sheet-close-btn" id="sheet-timeline-close" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </header>
+      <div class="app-sheet-body" id="sheet-timeline-content"></div>
+    </div>
+  </div>
+
   <!-- Slide-Up App Sheet: About & Gear -->
   <div id="sheet-about" class="app-sheet-modal" role="dialog" aria-modal="true" aria-label="The hike and gear list">
     <div class="app-sheet-backdrop" id="sheet-about-backdrop"></div>
@@ -97,9 +119,9 @@
   <!-- Slide-Up App Sheet: Compose Update -->
   <div id="sheet-compose" class="app-sheet-modal" role="dialog" aria-modal="true" aria-label="New trail update">
     <div class="app-sheet-backdrop" id="sheet-compose-backdrop"></div>
-    <div class="app-sheet-dialog">
+    <div class="app-sheet-dialog tall">
       <header class="app-sheet-header">
-        <h2 class="app-sheet-title">New Trail Update</h2>
+        <h2 class="app-sheet-title">Compose Trail Update</h2>
         <button type="button" class="app-sheet-close-btn" id="sheet-compose-close" aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
