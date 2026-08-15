@@ -1,9 +1,111 @@
 /**
- * DAM HIKES - Hike Overview, Hiker Bio & Data Management Screen
+ * DAM HIKES - About The Hike & Gear Breakdown Panel
  */
 
-import { store } from '../state.js';
-import { PCT_SECTIONS } from '../data/pct-route.js';
+export const GEAR = [
+  {
+    id: "pack",
+    label: "Pack",
+    items: [
+      { name: "Pack", spec: "Hyperlite Southwest 40", oz: 28.6 },
+      { name: "Shoulder pocket", spec: "Ultralight water bottle holster", oz: 1.1 },
+      { name: "Stuff sacks", spec: "3× cuben / nylon mix", oz: 2.4 },
+    ],
+  },
+  {
+    id: "shelter",
+    label: "Shelter",
+    items: [
+      { name: "Tent", spec: "Durston X-Mid 1 Pro", oz: 17.3 },
+      { name: "Stakes", spec: "6× shepherd + 2 extras", oz: 2.6 },
+      { name: "Ground sheet", spec: "Polycryo half", oz: 1.8 },
+    ],
+  },
+  {
+    id: "sleep",
+    label: "Sleep",
+    items: [
+      { name: "Quilt", spec: "EE Revelation 20°F, regular", oz: 20.4 },
+      { name: "Pad", spec: "Therm-a-Rest NeoAir XLite NXT", oz: 13.0 },
+      { name: "Pillow", spec: "Inflatable + stuff sack", oz: 1.9 },
+    ],
+  },
+  {
+    id: "cook",
+    label: "Cook",
+    items: [
+      { name: "Stove", spec: "Soto Windmaster", oz: 3.0 },
+      { name: "Pot", spec: "Toaks 550 ml titanium", oz: 2.6 },
+      { name: "Spork", spec: "Titanium long-handle", oz: 0.6 },
+      { name: "Canister", spec: "110 g isobutane (carried)", oz: 7.4 },
+    ],
+  },
+  {
+    id: "water",
+    label: "Water",
+    items: [
+      { name: "Filter", spec: "Sawyer Squeeze + CNOC 2L", oz: 4.2 },
+      { name: "Bottles", spec: "2× Smartwater 1 L", oz: 2.6 },
+      { name: "Backflush", spec: "Syringe", oz: 1.1 },
+    ],
+  },
+  {
+    id: "worn",
+    label: "Worn",
+    items: [
+      { name: "Shoes", spec: "Altra Lone Peak 8", oz: 0, worn: true },
+      { name: "Socks", spec: "Darn Tough 1/4", oz: 0, worn: true },
+      { name: "Shorts", spec: "Patagonia Terrebonne", oz: 0, worn: true },
+      { name: "Sun hoodie", spec: "Patagonia Capilene", oz: 0, worn: true },
+      { name: "Hat", spec: "Sunday Afternoons Adventure", oz: 0, worn: true },
+    ],
+  },
+  {
+    id: "clothing",
+    label: "Carried clothing",
+    items: [
+      { name: "Puffy", spec: "Enlightened Equipment Torrid", oz: 8.4 },
+      { name: "Rain jacket", spec: "Frogg Toggs Ultra-Lite2", oz: 5.6 },
+      { name: "Rain skirt", spec: "DIY silpoly", oz: 1.8 },
+      { name: "Sleep clothes", spec: "Merino tee + long johns", oz: 6.2 },
+      { name: "Gloves / beanie", spec: "Lightweight pair", oz: 2.4 },
+      { name: "Extra socks", spec: "2 pair Darn Tough", oz: 3.6 },
+    ],
+  },
+  {
+    id: "electronics",
+    label: "Electronics",
+    items: [
+      { name: "Phone", spec: "In a ziplock, FarOut + Gaia", oz: 7.2 },
+      { name: "Power bank", spec: "Anker 10k", oz: 6.7 },
+      { name: "Cables / plug", spec: "USB-C kit", oz: 1.8 },
+      { name: "Headlamp", spec: "Nitecore NU25 UL", oz: 1.6 },
+      { name: "Tracker", spec: "Garmin inReach Mini 2", oz: 3.5 },
+    ],
+  },
+  {
+    id: "kit",
+    label: "Small kit",
+    items: [
+      { name: "First aid", spec: "Leukotape, ibuprofen, repair", oz: 3.2 },
+      { name: "Hygiene", spec: "Trowel, soap, toothbrush", oz: 2.8 },
+      { name: "Sun / bugs", spec: "Sunscreen stick + 30% DEET", oz: 2.1 },
+      { name: "Knife / light", spec: "Tiny SAK + bic", oz: 1.4 },
+      { name: "Wallet / ID", spec: "Permit, cards, cash", oz: 1.2 },
+    ],
+  },
+];
+
+function packWeightOz(groups = GEAR) {
+  return groups.reduce(
+    (sum, g) => sum + g.items.reduce((s, item) => s + (item.worn ? 0 : item.oz), 0),
+    0
+  );
+}
+
+function ozToLb(oz) {
+  return `${(oz / 16).toFixed(1)} lb`;
+}
 
 export class OverviewScreen {
   constructor(containerId) {
@@ -11,203 +113,66 @@ export class OverviewScreen {
   }
 
   init() {
-    store.subscribe((s, eventType) => {
-      if (eventType === 'screen_change' && store.activeScreen === 'overview') {
-        this.render();
-      }
-    });
+    this.render();
   }
 
   render() {
     const container = document.getElementById(this.containerId);
     if (!container) return;
 
-    const totalMoments = store.moments.length;
-    const completedMoments = store.moments.filter(m => m.mileMarker <= (store.getSelectedMoment()?.mileMarker || 0)).length;
+    const packOz = packWeightOz();
 
     container.innerHTML = `
-      <div class="overview-screen-layout">
-        <!-- Top Navigation -->
-        <header class="overview-header">
-          <button class="btn-secondary" id="btn-overview-back">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-            <span>Back to Trail Map</span>
-          </button>
-          <div class="overview-title-group">
-            <h2>Hike Overview & Hiker Bio</h2>
-            <p class="overview-subtitle">Pacific Crest Trail · Southbound Expedition (SOBO)</p>
-          </div>
-        </header>
+      <div>
+        <img src="photos/hiker-back.jpg" alt="Walking south into the Oregon woods" class="about-hero-img" />
+        
+        <div class="about-intro-text">
+          <p>
+            Walking the PCT south from Cascade Locks — mile 2150 — toward Campo.
+            Start is 14 August 2026.
+          </p>
+          <p>
+            This feed is for family and friends. I post when I have a signal. If
+            a few days go quiet, I am between towns.
+          </p>
+        </div>
 
-        <div class="overview-content-grid">
-          <!-- 1. Hiker Bio Card -->
-          <div class="overview-bio-card">
-            <div class="bio-avatar-wrapper">
-              <div class="bio-avatar-placeholder">DAM</div>
-            </div>
-            <div class="bio-info">
-              <div class="bio-name-row">
-                <h3>Daniel Armando Martinez</h3>
-                <span class="bio-trail-name">Trail Name: <strong>DAM</strong></span>
-              </div>
-              <p class="bio-tagline">Southbound PCT Thru-Hiker · Cascade Locks to Campo · 2,150 Miles</p>
-              <p class="bio-narrative">
-                "Going Southbound (SOBO) means starting in the lush, moss-draped forests of the Pacific Northwest and racing the oncoming winter snowpack through the High Sierra before descending into the Mojave desert. This journal is a map-first living chronicle of the trail, the people, the hardships, and the quiet moments between the mountains."
-              </p>
-            </div>
+        <div class="gear-header-row">
+          <div>
+            <p class="gear-base-label">Base weight</p>
+            <h3 class="gear-base-title">Gear</h3>
           </div>
+          <p class="gear-base-weight">${ozToLb(packOz)}</p>
+        </div>
+        <p class="gear-subtitle-note">
+          Worn clothing is not counted. Food and water change every carry.
+        </p>
 
-          <!-- 2. Thru-Hike Key Stats -->
-          <div class="overview-stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon">🥾</div>
-              <div class="stat-value">2,150.0</div>
-              <div class="stat-label">Total Miles Southbound</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">⛰️</div>
-              <div class="stat-value">13,200 ft</div>
-              <div class="stat-label">Trail Zenith (Forester Pass)</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">📈</div>
-              <div class="stat-value">420,800+</div>
-              <div class="stat-label">Total Elevation Gain (ft)</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">📅</div>
-              <div class="stat-value">97 Days</div>
-              <div class="stat-label">Total Trail Days (4 Zeros)</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">📍</div>
-              <div class="stat-value">${totalMoments}</div>
-              <div class="stat-label">Logged Waypoints & Stories</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🎒</div>
-              <div class="stat-value">11.4 lbs</div>
-              <div class="stat-label">Average Base Pack Weight</div>
-            </div>
-          </div>
-
-          <!-- 3. Section Breakdown -->
-          <div class="overview-sections-box">
-            <h3 class="overview-heading">Trail Sections & Terrains</h3>
-            <div class="sections-grid">
-              ${PCT_SECTIONS.map(sec => `
-                <div class="section-card sec-border-${sec.id}">
-                  <div class="sec-header">
-                    <span class="sec-name">${sec.name}</span>
-                    <span class="sec-miles">Mile ${sec.startMile.toFixed(0)} - ${sec.endMile.toFixed(0)}</span>
-                  </div>
-                  <p class="sec-desc">${sec.description}</p>
+        <div class="gear-groups-stack">
+          ${GEAR.map(group => {
+            const subtotal = group.items.reduce((s, item) => s + (item.worn ? 0 : item.oz), 0);
+            return `
+              <section>
+                <div class="gear-group-header">
+                  <h4 class="gear-group-title">${group.label}</h4>
+                  <span class="gear-group-oz">${subtotal > 0 ? `${subtotal.toFixed(1)} oz` : 'worn'}</span>
                 </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- 4. Gear & Resupply Strategy -->
-          <div class="overview-gear-box">
-            <h3 class="overview-heading">The "Big Three" & Essential Gear</h3>
-            <div class="gear-list-grid">
-              <div class="gear-item">
-                <strong>🎒 Pack:</strong> Gossamer Gear Mariposa 60L (31 oz)
-              </div>
-              <div class="gear-item">
-                <strong>⛺ Shelter:</strong> Zpacks Duplex Dyneema Tent (19 oz)
-              </div>
-              <div class="gear-item">
-                <strong>🛌 Sleep System:</strong> Katabatic Sawatch 15°F Quilt + Therm-a-Rest NeoAir XTherm
-              </div>
-              <div class="gear-item">
-                <strong>👟 Footwear:</strong> Hoka Speedgoat 5 (4 pairs total over 2,150 mi)
-              </div>
-              <div class="gear-item">
-                <strong>🍳 Cookware:</strong> BRS-3000T Titanium Stove + TOAKS 750ml Pot
-              </div>
-              <div class="gear-item">
-                <strong>💧 Filtration:</strong> Sawyer Squeeze + 2L CNOC Vecto Water Bladder
-              </div>
-            </div>
-          </div>
-
-          <!-- 5. Data Backup & Management -->
-          <div class="overview-data-management-box">
-            <h3 class="overview-heading">💾 Journal Data & Backups</h3>
-            <p>Export your trail journal to keep a permanent backup or transfer your entries to another device.</p>
-            <div class="data-actions-row">
-              <button class="btn-primary" id="btn-export-json">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Export Journal (JSON)</span>
-              </button>
-              
-              <label class="btn-secondary file-upload-label" id="label-import-json">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span>Import Backup</span>
-                <input type="file" id="input-import-json" accept=".json" style="display: none;" />
-              </label>
-
-              <button class="btn-outline-danger" id="btn-reset-default-data">
-                <span>Reset to Seed Data</span>
-              </button>
-            </div>
-          </div>
+                <ul class="gear-items-list">
+                  ${group.items.map(item => `
+                    <li class="gear-item-row">
+                      <span class="gear-item-name">
+                        ${item.name}
+                        <span class="gear-item-spec"> · ${item.spec}</span>
+                      </span>
+                      <span class="gear-item-weight">${item.worn ? '—' : `${item.oz.toFixed(1)}`}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </section>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
-
-    this.attachEventListeners(container);
-  }
-
-  attachEventListeners(container) {
-    // Back Button
-    const backBtn = container.querySelector('#btn-overview-back');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        store.setScreen('explorer');
-      });
-    }
-
-    // Export JSON
-    const exportBtn = container.querySelector('#btn-export-json');
-    if (exportBtn) {
-      exportBtn.addEventListener('click', () => {
-        store.exportJSON();
-      });
-    }
-
-    // Import JSON
-    const importInput = container.querySelector('#input-import-json');
-    if (importInput) {
-      importInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const res = store.importJSON(event.target.result);
-            if (res.success) {
-              alert(`Successfully imported ${res.count} trail moments!`);
-              store.setScreen('explorer');
-            } else {
-              alert(`Import failed: ${res.error}`);
-            }
-          };
-          reader.readAsText(file);
-        }
-      });
-    }
-
-    // Reset Data
-    const resetBtn = container.querySelector('#btn-reset-default-data');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        if (confirm('Reset journal to original seed moments? Custom entries will be replaced.')) {
-          store.resetToDefaults();
-          alert('Journal reset to default PCT SOBO journey data.');
-          store.setScreen('explorer');
-        }
-      });
-    }
   }
 }
