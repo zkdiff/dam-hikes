@@ -1,5 +1,5 @@
 /**
- * DAM HIKES - SVG Elevation Profile with Integrated Step Navigation Component
+ * DAM HIKES - SVG Elevation Profile & Integrated Step Navigation Component
  */
 
 import { START_MILE, ELEVATION_PROFILE, elevationAtMile, formatElevation, formatMiles } from '../data/pct-route.js';
@@ -80,27 +80,16 @@ export class ElevationProfile {
     }).join('');
 
     container.innerHTML = `
+      <!-- Elevation Profile Header -->
       <div class="elevation-profile-header">
-        <div class="elevation-header-left">
-          <span class="elevation-title-label">Elevation</span>
-          <span class="elevation-readout">
-            ${formatElevation(sample.elevFt)}
-            <span class="elevation-readout-sub"> · mi ${formatMiles(sample.mile)}${sample.label ? ' · ' + sample.label : ''}</span>
-          </span>
-        </div>
-
-        <!-- Integrated Previous / Next Navigation -->
-        <div class="elevation-header-nav">
-          <button type="button" class="btn-elev-step" id="btn-elev-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on trail" title="Previous update (North)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <span class="elev-step-count">${total > 0 ? `${index + 1} / ${total}` : '—'}</span>
-          <button type="button" class="btn-elev-step" id="btn-elev-next" ${index >= total - 1 ? 'disabled' : ''} aria-label="Next update, south on trail" title="Next update (South)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
+        <span class="elevation-title-label">Elevation</span>
+        <span class="elevation-readout">
+          ${formatElevation(sample.elevFt)}
+          <span class="elevation-readout-sub"> · mi ${formatMiles(sample.mile)}${sample.label ? ' · ' + sample.label : ''}</span>
+        </span>
       </div>
 
+      <!-- SVG Elevation Chart -->
       <svg viewBox="0 0 ${VW} ${VH}" class="elevation-svg-chart" id="elevation-svg" role="img" aria-label="Elevation profile from Cascade Locks to Campo">
         <defs>
           <linearGradient id="elevation-gradient-fill" x1="0" y1="0" x2="0" y2="1">
@@ -136,9 +125,23 @@ export class ElevationProfile {
         ` : ''}
       </svg>
 
+      <!-- Axis Labels -->
       <div class="elevation-axis-labels">
         <span>Cascade Locks</span>
         <span>Campo</span>
+      </div>
+
+      <!-- Exact Original Previous & Next Navigation Component -->
+      <div class="trail-elevation-nav">
+        <button type="button" class="btn-step-arrow" id="btn-elev-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on the trail">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <p class="trail-step-count">
+          ${total > 0 ? `${index + 1} / ${total} on trail` : '0 on trail'}
+        </p>
+        <button type="button" class="btn-step-arrow" id="btn-elev-next" ${index >= total - 1 ? 'disabled' : ''} aria-label="Next update, south on the trail">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
     `;
 
