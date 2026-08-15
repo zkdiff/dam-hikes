@@ -154,11 +154,18 @@ export class TrailMap {
       }
     });
 
-    // Zoom Buttons
+    // Control Buttons
     document.getElementById('btn-zoom-in')?.addEventListener('click', () => this.map.zoomIn());
     document.getElementById('btn-zoom-out')?.addEventListener('click', () => this.map.zoomOut());
     document.getElementById('btn-frame-here')?.addEventListener('click', () => store.setFrame('here'));
     document.getElementById('btn-frame-trail')?.addEventListener('click', () => store.setFrame('trail'));
+
+    // Window resize / orientation change listener
+    window.addEventListener('resize', () => {
+      this.map.invalidateSize();
+      this.lastFocus = '';
+      this.updateCamera();
+    });
 
     setTimeout(() => {
       this.map.invalidateSize();
@@ -267,13 +274,24 @@ export class TrailMap {
     this.lastFocus = key;
 
     const bottomDock = document.getElementById('bottom-dock-container');
-    const bottomH = bottomDock ? bottomDock.getBoundingClientRect().height : 360;
+    const isLandscape = window.matchMedia('((min-width: 1024px) and (orientation: landscape)), (min-width: 1100px)').matches;
 
-    const pad = {
-      paddingTopLeft: [20, 108],
-      paddingBottomRight: [20, Math.max(160, bottomH + 16)],
-      animate: true
-    };
+    let pad;
+    if (isLandscape) {
+      const dockW = bottomDock ? bottomDock.getBoundingClientRect().width : 440;
+      pad = {
+        paddingTopLeft: [20, 108],
+        paddingBottomRight: [Math.max(380, dockW + 28), 24],
+        animate: true
+      };
+    } else {
+      const bottomH = bottomDock ? bottomDock.getBoundingClientRect().height : 360;
+      pad = {
+        paddingTopLeft: [20, 108],
+        paddingBottomRight: [20, Math.max(160, bottomH + 16)],
+        animate: true
+      };
+    }
 
     if (store.frame === 'trail') {
       const bounds = L.latLngBounds(PCT_WAYPOINTS.map(wp => [wp.lat, wp.lon]));

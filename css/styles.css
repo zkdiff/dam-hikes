@@ -1129,3 +1129,65 @@ button:disabled {
   object-fit: contain;
   border-radius: var(--radius-sm);
 }
+
+/* --- Landscape & Desktop Side-Dock Media Query --- */
+@media ((min-width: 1024px) and (orientation: landscape)), (min-width: 1100px) {
+  .bottom-dock-container {
+    top: 76px;
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+    width: 440px;
+    max-width: 440px;
+    height: auto;
+    max-height: calc(100dvh - 96px);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-popup);
+  }
+
+  .elevation-profile-bar {
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    flex-shrink: 0;
+  }
+
+  #moment-detail-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+  }
+
+  .trail-card-article {
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .trail-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .trail-body-expanded {
+    max-height: 42dvh;
+  }
+
+  .floating-map-controls {
+    right: 476px;
+    top: 76px;
+    transition: right 0.2s ease;
+  }
+
+  .floating-header {
+    max-width: calc(100vw - 480px);
+    margin: 0;
+  }
+}
