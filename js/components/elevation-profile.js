@@ -1,5 +1,6 @@
 /**
  * DAM HIKES - SVG Elevation Profile & Integrated Step Navigation Component
+ * With responsive mobile sheet minimize/expand support.
  */
 
 import { START_MILE, ELEVATION_PROFILE, elevationAtMile, formatElevation, formatMiles } from '../data/pct-route.js';
@@ -44,6 +45,7 @@ export class ElevationProfile {
   constructor(containerId) {
     this.containerId = containerId;
     this.hoverMile = null;
+    this.isMinimized = false;
     this.pathData = buildProfilePath(VW, VH);
   }
 
@@ -80,14 +82,19 @@ export class ElevationProfile {
     }).join('');
 
     container.innerHTML = `
-      <!-- Exact Original Previous & Next Navigation Component (Positioned Above Elevation Profile) -->
+      <!-- Step Navigation (Positioned Above Elevation Profile) -->
       <div class="trail-elevation-nav">
         <button type="button" class="btn-step-arrow" id="btn-elev-prev" ${index <= 0 ? 'disabled' : ''} aria-label="Previous update, north on the trail">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <p class="trail-step-count">
-          ${total > 0 ? `${index + 1} / ${total} on trail` : '0 on trail'}
-        </p>
+
+        <div class="trail-step-center-wrap" id="btn-elev-toggle-dock" title="Tap to expand / collapse story card">
+          <p class="trail-step-count">
+            ${total > 0 ? `${index + 1} / ${total} on trail` : '0 on trail'}
+          </p>
+          <span class="mobile-dock-hint">${this.isMinimized ? '▴ Show Card' : '▾ Map Focus'}</span>
+        </div>
+
         <button type="button" class="btn-step-arrow" id="btn-elev-next" ${index >= total - 1 ? 'disabled' : ''} aria-label="Next update, south on the trail">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
@@ -150,57 +157,86 @@ export class ElevationProfile {
 
   attachEvents(container) {
     // Step Prev / Next Buttons
-    container.querySelector('#btn-elev-prev')?.addEventListener('click', () => {
+    container.querySelector('#btn-elev-prev')?.addEventListener('click', (e) => {
+      e.stopPropagation();
       store.step(-1);
     });
 
-    container.querySelector('#btn-elev-next')?.addEventListener('click', () => {
+    container.querySelector('#btn-elev-next')?.addEventListener('click', (e) => {
+      e.stopPropagation();
       store.step(1);
     });
 
-    // Elevation SVG scrubber
+    // Toggle Dock Minimize / Expand
+    container.querySelector('#btn-elev-toggle-dock')?.addEventListener('click', () => {
+      this.isMinimized = !this.isMinimized;
+      const dock = document.getElementById('bottom-dock-container');
+      if (dock) {
+        dock.classList.toggle('is-minimized', this.isMinimized);
+      }
+      this.render();
+      window.dispatchEvent(new Event('resize'));
+    });
+
     const svg = container.querySelector('#elevation-svg');
     if (!svg) return;
 
-    const getMileFromClientX = (clientX) => {
-      const box = svg.getBoundingClientRect();
-      const t = Math.min(1, Math.max(0, (clientX - box.left) / box.width));
-      return START_MILE * (1 - t);
+    const getMileFromEvent = (evt) => {
+      const rect = svg.getBoundingClientRect();
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const ratio = x / rect.width;
+      return Math.round(START_MILE - ratio * START_MILE);
     };
 
-    svg.addEventListener('pointerdown', (e) => {
-      svg.setPointerCapture(e.pointerId);
-      const next = getMileFromClientX(e.clientX);
-      this.hoverMile = next;
-      store.setScrubMile(next);
+    svg.addEventListener('mousemove', (e) => {
+      this.hoverMile = getMileFromEvent(e);
       this.render();
+      store.setScrub(this.hoverMile);
     });
 
-    svg.addEventListener('pointermove', (e) => {
-      if (e.buttons === 0 && e.pointerType === 'mouse') {
-        const next = getMileFromClientX(e.clientX);
-        this.hoverMile = next;
-        store.setScrubMile(next);
-        this.render();
-        return;
+    svg.addEventListener('mouseleave', () => {
+      this.hoverMile = null;
+      this.render();
+      store.setScrub(null);
+    });
+
+    svg.addEventListener('touchstart', (e) => {
+      this.hoverMile = getMileFromEvent(e);
+      this.render();
+      store.setScrub(this.hoverMile);
+    }, { passive: true });
+
+    svg.addEventListener('touchmove', (e) => {
+      this.hoverMile = getMileFromEvent(e);
+      this.render();
+      store.setScrub(this.hoverMile);
+    }, { passive: true });
+
+    svg.addEventListener('touchend', () => {
+      this.hoverMile = null;
+      this.render();
+      store.setScrub(null);
+    });
+
+    svg.addEventListener('click', (e) => {
+      const mile = getMileFromEvent(e);
+      const filtered = store.getFilteredEntries();
+      if (filtered.length === 0) return;
+
+      // Find closest entry
+      let closest = filtered[0];
+      let minDist = Math.abs(closest.mile - mile);
+      for (const entry of filtered) {
+        const dist = Math.abs(entry.mile - mile);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = entry;
+        }
       }
-      if (e.buttons === 0) return;
-      const next = getMileFromClientX(e.clientX);
-      this.hoverMile = next;
-      store.setScrubMile(next);
-      this.render();
-    });
-
-    svg.addEventListener('pointerup', () => {
-      this.hoverMile = null;
-      store.setScrubMile(null);
-      this.render();
-    });
-
-    svg.addEventListener('pointerleave', () => {
-      this.hoverMile = null;
-      store.setScrubMile(null);
-      this.render();
+      if (closest) {
+        store.select(closest.id, 'entry');
+      }
     });
   }
 }

@@ -280,15 +280,15 @@ export class TrailMap {
     if (isLandscape) {
       const dockW = bottomDock ? bottomDock.getBoundingClientRect().width : 440;
       pad = {
-        paddingTopLeft: [Math.max(380, dockW + 28), 108],
+        paddingTopLeft: [Math.max(380, dockW + 28), 96],
         paddingBottomRight: [24, 24],
         animate: true
       };
     } else {
-      const bottomH = bottomDock ? bottomDock.getBoundingClientRect().height : 360;
+      const bottomH = bottomDock ? bottomDock.getBoundingClientRect().height : 180;
       pad = {
-        paddingTopLeft: [20, 108],
-        paddingBottomRight: [20, Math.max(160, bottomH + 16)],
+        paddingTopLeft: [16, 76],
+        paddingBottomRight: [16, Math.max(90, Math.round(bottomH) + 16)],
         animate: true
       };
     }

@@ -1763,3 +1763,134 @@ button:disabled {
     margin: 0 auto;
   }
 }
+
+/* --- Mobile Portrait Map-First Media Query (< 1024px) --- */
+@media (max-width: 1023px) {
+  .floating-header-wrapper {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    z-index: 45;
+  }
+
+  .floating-header {
+    padding: 6px 12px;
+  }
+
+  .brand-title {
+    font-size: 1.1rem;
+  }
+
+  .trail-status-line {
+    margin-top: 2px;
+    font-size: 12.5px;
+  }
+
+  .trail-mileage-counts {
+    margin-top: 1px;
+    font-size: 11px;
+  }
+
+  .btn-header-glass,
+  .btn-header-primary {
+    width: 36px;
+    height: 36px;
+  }
+
+  .bottom-dock-container {
+    max-height: 44dvh;
+    display: flex;
+    flex-direction: column;
+    transition: max-height 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), transform 0.28s ease;
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+  }
+
+  .bottom-dock-container.is-minimized {
+    max-height: 96px;
+  }
+
+  .bottom-dock-container.is-minimized #moment-detail-container {
+    display: none !important;
+  }
+
+  .elevation-profile-bar {
+    padding: 6px 12px 5px 12px;
+    flex-shrink: 0;
+  }
+
+  .trail-elevation-nav {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+  }
+
+  .elevation-svg-chart {
+    height: 38px;
+    margin-top: 2px;
+  }
+
+  #moment-detail-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .trail-card-photo-wrapper .carousel-slide-img {
+    height: 110px;
+  }
+
+  .trail-card-content {
+    padding: 10px 14px max(0.6rem, env(safe-area-inset-bottom)) 14px;
+  }
+
+  .card-heading {
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .words-direct-statement {
+    font-size: 15.5px;
+    line-height: 1.4;
+    padding: 2px 0 2px 10px;
+  }
+
+  .trail-bead-label {
+    display: none !important;
+  }
+
+  .floating-map-controls {
+    top: 86px;
+    right: 10px;
+  }
+
+  .trail-map-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.trail-step-center-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  cursor: pointer;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: rgba(228, 220, 203, 0.04);
+  transition: background 0.15s ease;
+}
+
+.trail-step-center-wrap:hover {
+  background: rgba(228, 220, 203, 0.1);
+}
+
+.mobile-dock-hint {
+  display: inline-block;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--color-trail);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
