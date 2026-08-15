@@ -43,7 +43,7 @@ export const MOMENTS_SEED = [
       { src: "photos/river-dusk.jpg", alt: "Misty river gorge flowing over smooth river stones" }
     ],
     scripture: {
-      source: "Śrī Īśopaniṣad (prabhupadabooks.com)",
+      source: "Śrī Īśopaniṣad",
       citation: "Mantra 1",
       transliteration: "īśāvāsyam idaṁ sarvaṁ yat kiñca jagatyāṁ jagat / tena tyaktena bhuñjīthā mā gṛdhaḥ kasya svid dhanam",
       translation: "Everything animate or inanimate that is within the universe is controlled and owned by the Lord. One should therefore accept only those things necessary for himself, which are set aside as his quota, and one should not accept other things, knowing well to whom they belong.",
@@ -132,7 +132,7 @@ export const MOMENTS_SEED = [
       { src: "photos/hiker-back.jpg", alt: "Hiker sitting in meditation on a granite boulder facing alpine lake" }
     ],
     scripture: {
-      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
+      source: "Bhagavad-gītā As It Is",
       citation: "Chapter 6, Verse 25",
       transliteration: "śanaiḥ śanair uparamed buddhyā dhṛti-gṛhītayā / ātma-saṁsthaṁ manaḥ kṛtvā na kiñcid api cintayet",
       translation: "Gradually, step by step, one should become situated in trance by means of intelligence sustained by full conviction, and thus the mind should be fixed on the Self alone and should think of nothing else.",
@@ -156,7 +156,7 @@ export const MOMENTS_SEED = [
     ],
     kirtan: {
       streamUrl: "kirtan-santiam-stream",
-      artist: "DAM & Trail Sangha (prabhupadabooks.com)",
+      artist: "DAM & Trail Sangha",
       mantra: "Hare Kṛṣṇa, Hare Kṛṣṇa, Kṛṣṇa Kṛṣṇa, Hare Hare\nHare Rāma, Hare Rāma, Rāma Rāma, Hare Hare",
       translation: "O all-attractive Supreme Lord, O spiritual energy of the Lord (Harā), please engage me in Your transcendental loving service.",
       ragaOrMood: "Evening Japa Meditation · Acoustic drone by the running mountain stream"
@@ -264,7 +264,7 @@ export const MOMENTS_SEED = [
       { src: "photos/mt-hood.jpg", alt: "Sheer granite towers of Castle Crags rising dramatically against thunderheads" }
     ],
     scripture: {
-      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
+      source: "Bhagavad-gītā As It Is",
       citation: "Chapter 2, Verse 70",
       transliteration: "āpūryamāṇam acala-pratiṣṭhaṁ samudram āpaḥ praviśanti yadvat / tadvat kāmā yaṁ praviśanti sarve sa śāntim āpnoti na kāma-kāmī",
       translation: "A person who is not disturbed by the incessant flow of desires — that enter like rivers into the ocean, which is ever being filled but is always still — can alone achieve peace, and not the man who strives to satisfy such desires.",
@@ -332,7 +332,7 @@ export const MOMENTS_SEED = [
     ],
     kirtan: {
       streamUrl: "thousand-island-dawn",
-      artist: "DAM & Mountain Solitude (prabhupadabooks.com)",
+      artist: "DAM & Mountain Solitude",
       mantra: "Hare Kṛṣṇa, Hare Kṛṣṇa, Kṛṣṇa Kṛṣṇa, Hare Hare\nHare Rāma, Hare Rāma, Rāma Rāma, Hare Hare",
       translation: "O all-attractive Supreme Lord, O spiritual energy of devotion, please connect me in loving service to all living beings.",
       ragaOrMood: "Rāga Bhūpālī · Morning stillness at 9,800 ft as the first pink alpenglow touches Banner Peak"
@@ -354,7 +354,7 @@ export const MOMENTS_SEED = [
       { src: "photos/trail-post.jpg", alt: "Historic stone dome hut built by the Sierra Club at nearly 12,000 feet" }
     ],
     scripture: {
-      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
+      source: "Bhagavad-gītā As It Is",
       citation: "Chapter 2, Verse 47",
       transliteration: "karmaṇy evādhikāras te mā phaleṣu kadācana / mā karma-phala-hetur bhūr mā te saṅgo 'stvakarmaṇi",
       translation: "You have a right to perform your prescribed duty, but you are not entitled to the fruits of action. Never consider yourself the cause of the results of your activities, and never be attached to not doing your duty.",
@@ -486,7 +486,7 @@ export const MOMENTS_SEED = [
       { src: "photos/river-dusk.jpg", alt: "Golden sunset over the coastal mountains looking toward the Pacific" }
     ],
     scripture: {
-      source: "Bhagavad-gītā As It Is (prabhupadabooks.com)",
+      source: "Bhagavad-gītā As It Is",
       citation: "Chapter 9, Verse 22",
       transliteration: "ananyāś cintayanto māṁ ye janāḥ paryupāsate / teṣāṁ nityābhiyuktānāṁ yoga-kṣemaṁ vahāmy aham",
       translation: "But those who always worship Me with exclusive devotion, meditating on My transcendental form — to them I carry what they lack, and I preserve what they have.",

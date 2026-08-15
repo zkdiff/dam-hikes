@@ -296,14 +296,13 @@ export class DetailPanel {
     // --- 4. 📜 SCRIPTURE READING TYPE ---
     } else if (type === 'scripture') {
       const s = entry.scripture || {};
-      const sourceName = s.source ? s.source.replace(' (prabhupadabooks.com)', '') : 'Bhagavad-gītā As It Is';
+      const sourceName = s.source ? s.source.replace(/\s*\(prabhupadabooks\.com\)/gi, '') : 'Bhagavad-gītā As It Is';
 
       cardBodyHtml = `
         <div class="type-card-scripture-layout">
-          <!-- Scripture Reference Badge & Link -->
-          <div class="scripture-badge-row" style="display: flex; justify-content: space-between; align-items: center;">
+          <!-- Scripture Reference Badge -->
+          <div class="scripture-badge-row">
             <span class="scripture-citation-pill">📜 ${sourceName} ${s.citation || ''}</span>
-            <a href="https://prabhupadabooks.com/" target="_blank" rel="noopener noreferrer" style="font-size: 10.5px; color: #fbbf24; text-decoration: underline; font-family: var(--font-mono);">prabhupadabooks.com ↗</a>
           </div>
 
           <!-- Sanskrit / Original Transliteration -->

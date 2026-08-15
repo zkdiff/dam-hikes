@@ -410,12 +410,12 @@ export class AuthorScreen {
 
         <div class="form-grid-2">
           <div class="form-field">
-            <label for="compose-scripture-source">Source (prabhupadabooks.com)</label>
+            <label for="compose-scripture-source">Scripture Source</label>
             <select id="compose-scripture-source" style="padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-fg); font-size: 13px;">
-              <option value="Bhagavad-gītā As It Is (prabhupadabooks.com)" ${s.source?.includes('Bhagavad') ? 'selected' : ''}>Bhagavad-gītā As It Is</option>
-              <option value="Śrī Īśopaniṣad (prabhupadabooks.com)" ${s.source?.includes('Īśopaniṣad') ? 'selected' : ''}>Śrī Īśopaniṣad</option>
-              <option value="Śrīmad-Bhāgavatam (prabhupadabooks.com)" ${s.source?.includes('Bhāgavatam') ? 'selected' : ''}>Śrīmad-Bhāgavatam</option>
-              <option value="Śrī Caitanya-caritāmṛta (prabhupadabooks.com)" ${s.source?.includes('Caitanya') ? 'selected' : ''}>Śrī Caitanya-caritāmṛta</option>
+              <option value="Bhagavad-gītā As It Is" ${s.source?.includes('Bhagavad') ? 'selected' : ''}>Bhagavad-gītā As It Is</option>
+              <option value="Śrī Īśopaniṣad" ${s.source?.includes('Īśopaniṣad') ? 'selected' : ''}>Śrī Īśopaniṣad</option>
+              <option value="Śrīmad-Bhāgavatam" ${s.source?.includes('Bhāgavatam') ? 'selected' : ''}>Śrīmad-Bhāgavatam</option>
+              <option value="Śrī Caitanya-caritāmṛta" ${s.source?.includes('Caitanya') ? 'selected' : ''}>Śrī Caitanya-caritāmṛta</option>
             </select>
           </div>
           <div class="form-field">
