@@ -45,6 +45,7 @@ class App {
     this.setupSheets();
     this.setupLightbox();
     this.setupKeyboardShortcuts();
+    this.preventDoubleTapZoom();
     this.updateHeaderStats();
 
     // 4. Subscribe to State Changes
@@ -55,6 +56,24 @@ class App {
     });
 
     console.log('🌲 DAM Hikes (Prototype Aesthetic + Full Functionality) initialized.');
+  }
+
+  preventDoubleTapZoom() {
+    let lastTouchEndTime = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEndTime <= 320) {
+        // If double-tapping on UI overlay controls (header, map buttons, bottom dock), prevent iOS Safari viewport zoom
+        if (!e.target.closest('#trail-map') || e.target.closest('.floating-header, .floating-map-controls, .bottom-dock-container, .btn-header-glass, .btn-header-primary')) {
+          e.preventDefault();
+          const btn = e.target.closest('button, a');
+          if (btn) {
+            btn.click();
+          }
+        }
+      }
+      lastTouchEndTime = now;
+    }, { passive: false });
   }
 
   setupHeader() {
