@@ -5,7 +5,9 @@
 import { MOMENTS_SEED } from './data/moments-seed.js';
 import { START_MILE, START_NAME, positionAtMile } from './data/pct-route.js';
 
-const STORAGE_KEY = 'dam_hikes_entries_v3';
+const STORAGE_KEY = 'dam_hikes_entries_v5';
+const SCHEMA_VERSION_KEY = 'dam_hikes_schema_ver';
+const CURRENT_SCHEMA_VER = '2026_08_15_five_types_v2';
 
 class TrailStore {
   constructor() {
@@ -27,12 +29,16 @@ class TrailStore {
 
   init() {
     try {
+      const ver = localStorage.getItem(SCHEMA_VERSION_KEY);
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
+
+      if (ver === CURRENT_SCHEMA_VER && stored) {
         this.entries = JSON.parse(stored);
       } else {
+        // Automatically upgrade/seed to the 5 distinct update types
         this.entries = [...MOMENTS_SEED];
         this.save();
+        localStorage.setItem(SCHEMA_VERSION_KEY, CURRENT_SCHEMA_VER);
       }
     } catch (e) {
       console.warn('Failed to load from localStorage, using seed data', e);
