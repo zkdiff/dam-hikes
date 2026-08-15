@@ -7,7 +7,7 @@ import { START_MILE, START_NAME, positionAtMile } from './data/pct-route.js';
 
 const STORAGE_KEY = 'dam_hikes_entries_v5';
 const SCHEMA_VERSION_KEY = 'dam_hikes_schema_ver';
-const CURRENT_SCHEMA_VER = '2026_08_15_clean_scripture_v4';
+const CURRENT_SCHEMA_VER = '2026_08_15_pure_acbsp_v5';
 
 class TrailStore {
   constructor() {

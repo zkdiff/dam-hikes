@@ -47,7 +47,7 @@ export const MOMENTS_SEED = [
       citation: "Mantra 1",
       transliteration: "īśāvāsyam idaṁ sarvaṁ yat kiñca jagatyāṁ jagat / tena tyaktena bhuñjīthā mā gṛdhaḥ kasya svid dhanam",
       translation: "Everything animate or inanimate that is within the universe is controlled and owned by the Lord. One should therefore accept only those things necessary for himself, which are set aside as his quota, and one should not accept other things, knowing well to whom they belong.",
-      purport: "Śrīla Prabhupāda explains: 'The root of all trouble is that man claims proprietary rights over the resources of nature.' On the trail, you learn this instantly: carry only your quota for the day — no more, no less — and recognize every spring, ridge, and sunrise as the Lord's property."
+      purport: "The root of all trouble is that man claims proprietary rights over the resources of nature. God is the proprietor of everything, and human beings are entitled only to the necessities of life allotted to them by the Lord. The arrangement of the Lord is that we should be satisfied with those things that have been kindly set aside for us by Him."
     }
   },
   {
@@ -136,7 +136,7 @@ export const MOMENTS_SEED = [
       citation: "Chapter 6, Verse 25",
       transliteration: "śanaiḥ śanair uparamed buddhyā dhṛti-gṛhītayā / ātma-saṁsthaṁ manaḥ kṛtvā na kiñcid api cintayet",
       translation: "Gradually, step by step, one should become situated in trance by means of intelligence sustained by full conviction, and thus the mind should be fixed on the Self alone and should think of nothing else.",
-      purport: "Śrīla Prabhupāda writes in his purport: 'By proper conviction and intelligence one should gradually cease sense activities. This is called pratyāhāra. The mind, being restrained from all sense activities, should be fixed in trance, thinking of nothing else.' On the trail, 'śanaiḥ śanair' (step by step) is the foundational truth — you do not leap across 2,150 miles; you place one conscious foot forward at a time."
+      purport: "By proper conviction and intelligence one should gradually cease sense activities. This is called pratyāhāra. The mind, being restrained from all sense activities, should be fixed in trance, thinking of nothing else. In yoga practice, the mind is controlled by determination and intelligence and is situated in the Self."
     }
   },
   {
@@ -268,7 +268,7 @@ export const MOMENTS_SEED = [
       citation: "Chapter 2, Verse 70",
       transliteration: "āpūryamāṇam acala-pratiṣṭhaṁ samudram āpaḥ praviśanti yadvat / tadvat kāmā yaṁ praviśanti sarve sa śāntim āpnoti na kāma-kāmī",
       translation: "A person who is not disturbed by the incessant flow of desires — that enter like rivers into the ocean, which is ever being filled but is always still — can alone achieve peace, and not the man who strives to satisfy such desires.",
-      purport: "Śrīla Prabhupāda explains: 'Although the vast ocean is always filled with water, it is continually being filled by rivers, yet the ocean remains steady; it is not agitated. Similarly, a person fixed in Kṛṣṇa consciousness is never agitated by desires.' Watching storm clouds swirl around the 6,000-foot granite horn of Castle Dome, the rock stands steady and unmoved."
+      purport: "Although the vast ocean is always filled with water, it is continually being filled by rivers, yet the ocean remains steady; it is not agitated. Similarly, a person fixed in Kṛṣṇa consciousness is never agitated by the flow of desires. A Kṛṣṇa conscious person does not strive to satisfy desires, yet he is never lacking anything because he is satisfied in Kṛṣṇa."
     }
   },
   {
@@ -358,7 +358,7 @@ export const MOMENTS_SEED = [
       citation: "Chapter 2, Verse 47",
       transliteration: "karmaṇy evādhikāras te mā phaleṣu kadācana / mā karma-phala-hetur bhūr mā te saṅgo 'stvakarmaṇi",
       translation: "You have a right to perform your prescribed duty, but you are not entitled to the fruits of action. Never consider yourself the cause of the results of your activities, and never be attached to not doing your duty.",
-      purport: "Śrīla Prabhupāda purports: 'The Lord advised that Arjuna should perform his prescribed duty without attachment to the result. One who is attached to the result of his work is also the cause of the action.' Climbing through freezing sleet at 12,000 feet, step follows step as pure prescribed duty without resentment or material expectation."
+      purport: "The Lord advised that Arjuna should perform his prescribed duty without attachment to the result. One who is attached to the result of his work is also the cause of the action, and is thus the enjoyer or sufferer of the result of such action."
     }
   },
   {
@@ -490,7 +490,7 @@ export const MOMENTS_SEED = [
       citation: "Chapter 9, Verse 22",
       transliteration: "ananyāś cintayanto māṁ ye janāḥ paryupāsate / teṣāṁ nityābhiyuktānāṁ yoga-kṣemaṁ vahāmy aham",
       translation: "But those who always worship Me with exclusive devotion, meditating on My transcendental form — to them I carry what they lack, and I preserve what they have.",
-      purport: "Śrīla Prabhupāda purports: 'The Lord helps such a devotee to achieve Kṛṣṇa consciousness by yoga, and when he becomes fully situated, the Lord protects him from falling down (kṣema).' Standing 40 miles from the Mexican border with the Pacific shimmering on the western horizon, you realize you were never walking alone."
+      purport: "One who is unable to live for a moment without Kṛṣṇa consciousness cannot think of anything else. Twenty-four hours a day, he is engaged in Kṛṣṇa consciousness by chanting, hearing, remembering and offering prayers. The Lord helps such a devotee to achieve Kṛṣṇa consciousness by yoga, and when he becomes fully situated, the Lord protects him from falling down (kṣema)."
     }
   },
   {

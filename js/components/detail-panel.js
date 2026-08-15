@@ -318,10 +318,10 @@ export class DetailPanel {
             <p class="scripture-translation-prose">${s.translation || ''}</p>
           </div>
 
-          <!-- Purport & Realization -->
+          <!-- Purport (ACBSP) -->
           ${s.purport ? `
             <div class="scripture-purport-box">
-              <span class="purport-header-label">Purport & Trail Realization</span>
+              <span class="purport-header-label">Purport by Śrīla Prabhupāda (ACBSP)</span>
               <p class="purport-prose">${s.purport}</p>
             </div>
           ` : ''}

@@ -435,8 +435,8 @@ export class AuthorScreen {
         </div>
 
         <div class="form-field">
-          <label for="compose-scripture-purport"><strong>Śrīla Prabhupāda Purport & Trail Realization</strong></label>
-          <textarea id="compose-scripture-purport" rows="4" required placeholder="Purport commentary and how this verse applies to the trail discipline...">${s.purport || ''}</textarea>
+          <label for="compose-scripture-purport"><strong>Purport by Śrīla Prabhupāda (ACBSP)</strong></label>
+          <textarea id="compose-scripture-purport" rows="4" required placeholder="Authentic book purport by Śrīla Prabhupāda...">${s.purport || ''}</textarea>
         </div>
       `;
 
