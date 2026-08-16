@@ -1,238 +1,681 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DAM Hikes · Component Gallery</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta name="description" content="DAM Hikes live component checks in a shared gallery structure." />
+  <meta name="theme-color" content="#121410" />
+  <link rel="preload" as="image" href="photos/pack-table.jpg" />
+  <link rel="preload" as="image" href="photos/bridge-gods.jpg" />
+  <link rel="preload" as="image" href="photos/river-dusk.jpg" />
+  <link rel="stylesheet" href="css/styles.css?v=4" />
   <style>
-    /* Gallery-specific overrides */
+    html,
     body {
-      overflow: auto !important;
-      height: auto !important;
-      padding: 24px;
-      background: #0d0e0c;
+      height: auto;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      overflow-y: visible;
+      scroll-behavior: smooth;
     }
-    .gallery-header {
-      margin-bottom: 32px;
+
+    body.components-page {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .components-page a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .gallery-shell {
+      width: min(100% - 2rem, 72rem);
+      margin: 0 auto;
+      padding: 2rem 0 6rem;
+    }
+
+    .gallery-page-header {
+      padding-bottom: 1.5rem;
       border-bottom: 1px solid var(--color-border);
-      padding-bottom: 16px;
     }
-    .gallery-header h1 {
-      font-size: 1.75rem;
-      margin-bottom: 4px;
-    }
-    .gallery-header p {
-      color: var(--color-muted);
-      font-size: 0.9rem;
-    }
-    .gallery-section {
-      margin-bottom: 48px;
-    }
-    .gallery-section h2 {
-      font-size: 1.1rem;
-      color: var(--color-primary);
-      margin-bottom: 12px;
-      letter-spacing: 0.02em;
+
+    .gallery-kicker,
+    .gallery-section > h2,
+    .gallery-sample-label,
+    .gallery-footer {
+      font-family: var(--font-mono);
       text-transform: uppercase;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
     }
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
-    }
-    .gallery-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      overflow: hidden;
-    }
-    .gallery-card h3 {
-      font-size: 0.85rem;
+
+    .gallery-kicker {
       color: var(--color-muted);
-      margin-bottom: 12px;
-      font-family: var(--font-mono);
-    }
-    .gallery-note {
       font-size: 0.75rem;
-      color: var(--color-subtle);
-      margin-top: 8px;
+      letter-spacing: 0.16em;
     }
-    /* Isolate some components */
-    .iso-header { position: relative; height: 80px; }
-    .iso-dock { position: relative; max-width: 420px; }
-    .iso-sheet { position: relative; max-width: 480px; height: 360px; overflow: auto; border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+
+    .gallery-page-header h1 {
+      margin-top: 0.25rem;
+      font-size: 1.875rem;
+      line-height: 1.2;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+
+    .gallery-intro {
+      max-width: 42rem;
+      margin-top: 0.5rem;
+      color: var(--color-muted);
+      font-size: 0.875rem;
+      line-height: 1.625;
+    }
+
+    .gallery-back-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      margin-top: 0.75rem;
+      color: var(--color-trail);
+      font-size: 0.875rem;
+    }
+
+    .gallery-nav {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      display: flex;
+      gap: 0.25rem;
+      margin-top: 1rem;
+      padding: 0.5rem 0;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--color-border);
+      background: rgba(18, 20, 16, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .gallery-nav a {
+      flex: none;
+      padding: 0.375rem 0.75rem;
+      border-radius: 999px;
+      color: var(--color-muted);
+      font-size: 0.75rem;
+    }
+
+    .gallery-nav a:hover,
+    .gallery-nav a:focus-visible {
+      background: var(--color-raised);
+      color: var(--color-fg);
+    }
+
+    .gallery-sections {
+      display: grid;
+      gap: 4rem;
+      margin-top: 2.5rem;
+    }
+
+    .gallery-section {
+      scroll-margin-top: 4.5rem;
+    }
+
+    .gallery-section > h2 {
+      color: var(--color-primary);
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+    }
+
+    .gallery-section-note {
+      max-width: 42rem;
+      margin: 0.25rem 0 1rem;
+      color: var(--color-muted);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .gallery-token-grid,
+    .gallery-category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    .gallery-token {
+      min-height: 4.25rem;
+      padding: 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .gallery-category-token {
+      min-height: 4.25rem;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--sample-color);
+      color: #121410;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .gallery-category-token span {
+      display: block;
+      margin-top: 0.25rem;
+      font-family: var(--font-sans);
+    }
+
+    .gallery-type-sample,
+    .gallery-surface,
+    .gallery-status-preview {
+      padding: 1.25rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+    }
+
+    .gallery-type-sample > * + * {
+      margin-top: 1rem;
+    }
+
+    .gallery-control-grid,
+    .gallery-badge-stack,
+    .gallery-map-layout,
+    .gallery-audio-grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .gallery-control-row,
+    .gallery-badge-row,
+    .gallery-map-buttons,
+    .gallery-route-key,
+    .gallery-bead-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .gallery-control-sample {
+      display: grid;
+      justify-items: center;
+      gap: 0.4rem;
+    }
+
+    .gallery-sample-label {
+      color: var(--color-subtle);
+      font-size: 0.625rem;
+      letter-spacing: 0.12em;
+    }
+
+    .gallery-form-grid {
+      display: grid;
+      gap: 0.875rem;
+      max-width: 34rem;
+    }
+
+    .gallery-form-grid textarea {
+      min-height: 7rem;
+      resize: vertical;
+    }
+
+    .gallery-map-buttons {
+      align-items: flex-start;
+    }
+
+    .gallery-map-button-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .gallery-bead-list {
+      align-items: flex-end;
+      min-height: 7rem;
+      padding-top: 2.5rem;
+    }
+
+    .gallery-bead-sample {
+      display: grid;
+      justify-items: center;
+      gap: 0.5rem;
+      min-width: 4.5rem;
+    }
+
+    .gallery-route-line {
+      display: inline-block;
+      width: 3rem;
+      height: 0;
+      border-top-style: solid;
+      border-radius: 999px;
+    }
+
+    .gallery-route-line.walked {
+      border-top-width: 2px;
+      border-color: rgba(228, 220, 203, 0.55);
+    }
+
+    .gallery-route-line.remaining {
+      border-top-width: 4px;
+      border-color: rgba(197, 212, 168, 0.95);
+      box-shadow: 0 0 0 4px rgba(197, 212, 168, 0.12);
+    }
+
+    .gallery-map-status {
+      color: var(--color-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .gallery-elevation-frame,
+    .gallery-card-frame {
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-border);
+    }
+
+    .gallery-elevation-frame {
+      max-width: 580px;
+    }
+
+    .gallery-card-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .gallery-card-frame {
+      align-self: start;
+      max-width: 580px;
+    }
+
+    .gallery-card-empty {
+      max-width: 580px;
+    }
+
+    .gallery-audio-sample {
+      display: grid;
+      gap: 0.5rem;
+      align-content: start;
+    }
+
+    .gallery-status-preview {
+      overflow: hidden;
+      background:
+        linear-gradient(to bottom, rgba(18, 20, 16, 0.32), rgba(18, 20, 16, 0.82)),
+        url("photos/gorge-trail.jpg") center / cover;
+    }
+
+    .gallery-footer {
+      padding-top: 3rem;
+      color: var(--color-subtle);
+      font-size: 0.6875rem;
+      letter-spacing: 0.08em;
+    }
+
+    @media (min-width: 640px) {
+      .gallery-shell {
+        width: min(100% - 3rem, 72rem);
+      }
+
+      .gallery-token-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .gallery-category-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .gallery-form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .gallery-form-grid .form-field:last-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (min-width: 960px) {
+      .gallery-token-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+
+      .gallery-category-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+
+      .gallery-card-grid,
+      .gallery-audio-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 639px) {
+      .gallery-status-preview {
+        padding: 1rem;
+      }
+
+    }
   </style>
 </head>
-<body>
-  <div class="gallery-header">
-    <h1>DAM Hikes Component Gallery</h1>
-    <p>All major UI components & states for detail work and consistency. Static visual catalog (not interactive Storybook).</p>
+<body class="components-page">
+  <main class="gallery-shell">
+    <header class="gallery-page-header">
+      <p class="gallery-kicker">DAM Hikes</p>
+      <h1>Component library</h1>
+      <p class="gallery-intro">The shared checklist structure stays consistent with 2150 South. Every sample inside it is DAM Hikes’ own live component, token, markup, and state.</p>
+      <a class="gallery-back-link" href="index.html">Back to the map</a>
+    </header>
+
+    <nav class="gallery-nav" aria-label="Component sections">
+      <a href="#color">Color</a>
+      <a href="#type">Type</a>
+      <a href="#controls">Controls</a>
+      <a href="#badges">Badges</a>
+      <a href="#map">Map chrome</a>
+      <a href="#moments">Moment cards</a>
+      <a href="#audio">Audio</a>
+      <a href="#status">Status</a>
+    </nav>
+
+    <div class="gallery-sections">
+      <section class="gallery-section" id="color">
+        <h2>Color</h2>
+        <p class="gallery-section-note">DAM Hikes woodland surfaces and its live category accents.</p>
+        <div class="gallery-token-grid">
+          <div class="gallery-token" style="background:var(--color-bg);color:var(--color-fg)">bg</div>
+          <div class="gallery-token" style="background:var(--color-surface);color:var(--color-fg)">surface</div>
+          <div class="gallery-token" style="background:var(--color-raised);color:var(--color-fg)">raised</div>
+          <div class="gallery-token" style="background:var(--color-fg);color:var(--color-bg)">fg</div>
+          <div class="gallery-token" style="background:var(--color-muted);color:var(--color-bg)">muted</div>
+          <div class="gallery-token" style="background:var(--color-subtle);color:var(--color-bg)">subtle</div>
+          <div class="gallery-token" style="background:var(--color-primary);color:var(--color-primary-fg)">primary</div>
+          <div class="gallery-token" style="background:var(--color-paper);color:var(--color-bg)">paper</div>
+          <div class="gallery-token" style="background:var(--color-trail);color:var(--color-bg)">trail</div>
+          <div class="gallery-token" style="background:var(--color-border);color:var(--color-fg)">border</div>
+        </div>
+        <div class="gallery-category-grid" style="margin-top:0.5rem">
+          <div class="gallery-category-token" style="--sample-color:#10b981">#10b981<span>Campsite</span></div>
+          <div class="gallery-category-token" style="--sample-color:#3b82f6">#3b82f6<span>Milestone / pass</span></div>
+          <div class="gallery-category-token" style="--sample-color:#f59e0b">#f59e0b<span>Resupply / town</span></div>
+          <div class="gallery-category-token" style="--sample-color:#8b5cf6">#8b5cf6<span>Wildlife &amp; flora</span></div>
+          <div class="gallery-category-token" style="--sample-color:#ef4444">#ef4444<span>Condition / hazard</span></div>
+          <div class="gallery-category-token" style="--sample-color:#ec4899">#ec4899<span>Journal reflection</span></div>
+        </div>
+      </section>
+
+      <section class="gallery-section" id="type">
+        <h2>Type</h2>
+        <p class="gallery-section-note">The exact display, interface, and metadata styles used in the app.</p>
+        <div class="gallery-type-sample">
+          <p class="brand-title">DAM Hikes</p>
+          <h3 class="card-heading">Bridge of the Gods: The Southbound Step</h3>
+          <p class="trail-status-line">Cascade Locks, OR · mi 2150.0 · Day 1</p>
+          <p class="card-meta-stamp">Aug 14, 2026 · Cascade Locks, OR · mi 2,150 · 180 ft</p>
+          <p class="words-direct-statement">“I only need the southern bank.”</p>
+        </div>
+      </section>
+
+      <section class="gallery-section" id="controls">
+        <h2>Controls</h2>
+        <p class="gallery-section-note">Live DAM Hikes actions and compose fields. Their shapes differ because their jobs differ.</p>
+        <div class="gallery-control-grid">
+          <div class="gallery-control-row">
+            <div class="gallery-control-sample">
+              <button type="button" class="btn-header-glass" aria-label="Browse timeline">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </button>
+              <span class="gallery-sample-label">Header glass</span>
+            </div>
+            <div class="gallery-control-sample">
+              <button type="button" class="btn-header-primary" aria-label="New update">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+              <span class="gallery-sample-label">Header primary</span>
+            </div>
+            <div class="gallery-control-sample">
+              <button type="button" class="trail-map-btn" aria-label="Focus current position">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+              </button>
+              <span class="gallery-sample-label">Map action</span>
+            </div>
+            <div class="gallery-control-sample">
+              <button type="button" class="btn-step-arrow" aria-label="Previous update">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="gallery-sample-label">Trail step</span>
+            </div>
+            <div class="gallery-control-sample">
+              <button type="button" class="btn-card-edit-quick">Edit</button>
+              <span class="gallery-sample-label">Quick edit</span>
+            </div>
+            <div class="gallery-control-sample">
+              <button type="button" class="card-read-more-btn">More details</button>
+              <span class="gallery-sample-label">Disclosure</span>
+            </div>
+          </div>
+          <div class="gallery-surface">
+            <div class="gallery-form-grid">
+              <div class="form-field">
+                <label for="gallery-location">Location</label>
+                <input id="gallery-location" value="Timberline Lodge, OR" />
+              </div>
+              <div class="form-field">
+                <label for="gallery-mile">PCT mile</label>
+                <input id="gallery-mile" type="number" value="2095" />
+              </div>
+              <div class="form-field">
+                <label for="gallery-notes">Notes</label>
+                <textarea id="gallery-notes">Dry and kind. First climb is real.</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="gallery-section" id="badges">
+        <h2>Badges</h2>
+        <p class="gallery-section-note">Category and section badges from live cards; filters and type tags from live author/timeline screens.</p>
+        <div class="gallery-badge-stack">
+          <div class="gallery-badge-row">
+            <span class="badge badge-category badge-cat-campsite">⛺ Campsite</span>
+            <span class="badge badge-category badge-cat-milestone">🏔️ Milestone / Pass</span>
+            <span class="badge badge-category badge-cat-resupply">🍕 Resupply / Town</span>
+            <span class="badge badge-category badge-cat-wildlife">🐻 Wildlife &amp; Flora</span>
+            <span class="badge badge-category badge-cat-hardship">⚡ Condition / Hazard</span>
+            <span class="badge badge-category badge-cat-reflection">📖 Journal Reflection</span>
+          </div>
+          <div class="gallery-badge-row">
+            <span class="badge badge-section">Oregon</span>
+            <button type="button" class="pill-btn active">Entire trail</button>
+            <button type="button" class="pill-btn">Northern California</button>
+            <button type="button" class="pill-category active">🏔️ Milestones</button>
+            <button type="button" class="pill-category">📖 Reflections</button>
+          </div>
+          <div class="gallery-badge-row">
+            <span class="type-tag">Statistics</span>
+            <span class="type-tag">Title + Words</span>
+            <span class="type-tag">Title + Voice</span>
+            <span class="type-tag">Scripture Reading</span>
+            <span class="type-tag">Kirtan</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="gallery-section" id="map">
+        <h2>Map chrome</h2>
+        <p class="gallery-section-note">The live solid walked/remaining lines, category-aware selected beads, map actions, and live ElevationProfile component.</p>
+        <div class="gallery-surface gallery-map-layout">
+          <div class="gallery-map-buttons">
+            <div class="gallery-map-button-stack">
+              <button type="button" class="trail-map-btn" data-map-action="here" aria-label="Center current location">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+              </button>
+              <button type="button" class="trail-map-btn" data-map-action="trail" aria-label="Fit whole trail">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H8.5a4.5 4.5 0 0 1 0-9H18"/><circle cx="18" cy="5" r="3"/></svg>
+              </button>
+              <button type="button" class="trail-map-btn" data-map-action="zoom-in" aria-label="Zoom in">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="trail-map-btn" data-map-action="zoom-out" aria-label="Zoom out">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            </div>
+            <div>
+              <div class="gallery-route-key">
+                <span class="gallery-route-line walked" aria-hidden="true"></span><span>Walked</span>
+                <span class="gallery-route-line remaining" aria-hidden="true"></span><span>Remaining</span>
+              </div>
+              <output class="gallery-map-status" id="gallery-map-status" aria-live="polite">Trail framed · zoom 6</output>
+            </div>
+          </div>
+
+          <div class="gallery-bead-list" aria-label="Selected map bead examples">
+            <div class="gallery-bead-sample">
+              <div class="trail-bead is-selected" style="--bead-color:#10b981;border-color:#10b981;box-shadow:0 0 0 4px #10b98155"><span>⛺</span></div>
+              <span class="gallery-sample-label">Campsite</span>
+            </div>
+            <div class="gallery-bead-sample">
+              <div class="trail-bead is-selected" style="--bead-color:#3b82f6;border-color:#3b82f6;box-shadow:0 0 0 4px #3b82f655"><span>🏔️</span></div>
+              <span class="gallery-sample-label">Pass</span>
+            </div>
+            <div class="gallery-bead-sample">
+              <div class="trail-bead is-selected" style="--bead-color:#f59e0b;border-color:#f59e0b;box-shadow:0 0 0 4px #f59e0b55"><span>🍕</span></div>
+              <span class="gallery-sample-label">Town</span>
+            </div>
+            <div class="gallery-bead-sample">
+              <div class="trail-bead is-selected" style="--bead-color:#8b5cf6;border-color:#8b5cf6;box-shadow:0 0 0 4px #8b5cf655"><span>🐻</span></div>
+              <span class="gallery-sample-label">Wildlife</span>
+            </div>
+            <div class="gallery-bead-sample">
+              <div class="trail-bead is-selected" style="--bead-color:#ef4444;border-color:#ef4444;box-shadow:0 0 0 4px #ef444455"><span>⚡</span></div>
+              <span class="gallery-sample-label">Hazard</span>
+            </div>
+            <div class="gallery-bead-sample">
+              <div class="trail-bead is-selected" style="--bead-color:#ec4899;border-color:#ec4899;box-shadow:0 0 0 4px #ec489955"><span>📖</span></div>
+              <span class="gallery-sample-label">Reflection</span>
+            </div>
+          </div>
+
+          <div class="gallery-elevation-frame">
+            <div class="elevation-profile-bar" id="gallery-elevation-profile"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="gallery-section" id="moments">
+        <h2>Moment cards</h2>
+        <p class="gallery-section-note">One isolated sample per live DetailPanel type. These are rendered by the same class as the map app, so Statistics, Words, Voice, Scripture, and Kirtan remain visibly distinct.</p>
+        <div class="gallery-card-grid">
+          <div>
+            <p class="gallery-sample-label" style="margin-bottom:0.5rem">Statistics</p>
+            <div class="gallery-card-frame" id="gallery-card-statistics" data-entry-id="timberline-waffles"></div>
+          </div>
+          <div>
+            <p class="gallery-sample-label" style="margin-bottom:0.5rem">Title + Words</p>
+            <div class="gallery-card-frame" id="gallery-card-words" data-entry-id="the-gorge"></div>
+          </div>
+          <div>
+            <p class="gallery-sample-label" style="margin-bottom:0.5rem">Title + Voice</p>
+            <div class="gallery-card-frame" id="gallery-card-voice" data-entry-id="hood-rim-voice"></div>
+          </div>
+          <div>
+            <p class="gallery-sample-label" style="margin-bottom:0.5rem">Scripture Reading</p>
+            <div class="gallery-card-frame" id="gallery-card-scripture" data-entry-id="columbia-river-scripture"></div>
+          </div>
+          <div>
+            <p class="gallery-sample-label" style="margin-bottom:0.5rem">Kirtan</p>
+            <div class="gallery-card-frame" id="gallery-card-kirtan" data-entry-id="dusk-kirtan-river"></div>
+          </div>
+          <div class="gallery-card-empty">
+            <p class="gallery-sample-label" style="margin-bottom:0.5rem">Empty / no results</p>
+            <article class="trail-card-article" style="padding:24px 16px;text-align:center;color:var(--color-muted)">No updates found matching current filters.</article>
+          </div>
+        </div>
+      </section>
+
+      <section class="gallery-section" id="audio">
+        <h2>Audio</h2>
+        <p class="gallery-section-note">The live voice-dispatch waveform and the intentionally different kirtan stream player.</p>
+        <div class="gallery-audio-grid">
+          <div class="gallery-audio-sample">
+            <p class="gallery-sample-label">Voice dispatch</p>
+            <div class="voice-player-bar" data-gallery-audio="voice" data-audio-id="gallery-audio-voice" data-duration="164">
+              <button type="button" class="btn-audio-play-toggle" aria-label="Play voice recording">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <div class="waveform-container">
+                <svg class="waveform-svg" viewBox="0 0 200 36" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M4 18v-8M10 18v-12M16 18v-6M22 18v-14M28 18v-10M34 18v-16M40 18v-12M46 18v-6M52 18v-14M58 18v-10M64 18v-16M70 18v-12M76 18v-8M82 18v-14M88 18v-16M94 18v-10M100 18v-14M106 18v-8M112 18v-12M118 18v-16M124 18v-10M130 18v-14M136 18v-8M142 18v-12M148 18v-16M154 18v-10M160 18v-14M166 18v-8M172 18v-12M178 18v-6M184 18v-10M190 18v-4M196 18v-8M4 18v8M10 18v12M16 18v6M22 18v14M28 18v10M34 18v16M40 18v12M46 18v6M52 18v14M58 18v10M64 18v16M70 18v12M76 18v8M82 18v14M88 18v16M94 18v10M100 18v14M106 18v8M112 18v12M118 18v16M124 18v10M130 18v14M136 18v8M142 18v12M148 18v16M154 18v10M160 18v14M166 18v8M172 18v12M178 18v6M184 18v10M190 18v4M196 18v8" stroke="rgba(236,231,220,0.28)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <div class="waveform-progress-bar">
+                  <svg class="waveform-svg active-wave" viewBox="0 0 200 36" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M4 18v-8M10 18v-12M16 18v-6M22 18v-14M28 18v-10M34 18v-16M40 18v-12M46 18v-6M52 18v-14M58 18v-10M64 18v-16M70 18v-12M76 18v-8M82 18v-14M88 18v-16M94 18v-10M100 18v-14M106 18v-8M112 18v-12M118 18v-16M124 18v-10M130 18v-14M136 18v-8M142 18v-12M148 18v-16M154 18v-10M160 18v-14M166 18v-8M172 18v-12M178 18v-6M184 18v-10M190 18v-4M196 18v-8M4 18v8M10 18v12M16 18v6M22 18v14M28 18v10M34 18v16M40 18v12M46 18v6M52 18v14M58 18v10M64 18v16M70 18v12M76 18v8M82 18v14M88 18v16M94 18v10M100 18v14M106 18v8M112 18v12M118 18v16M124 18v10M130 18v14M136 18v8M142 18v12M148 18v16M154 18v10M160 18v14M166 18v8M172 18v12M178 18v6M184 18v10M190 18v4M196 18v8" stroke="#c5d4a8" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="audio-time-stamp"><span class="audio-current-time">0:00</span> / 02:44</div>
+            </div>
+          </div>
+
+          <div class="gallery-audio-sample">
+            <p class="gallery-sample-label">Kirtan stream</p>
+            <div class="kirtan-player-bar" data-gallery-audio="kirtan" data-audio-id="gallery-audio-kirtan" data-duration="300">
+              <button type="button" class="btn-kirtan-play-toggle" aria-label="Play devotional kirtan stream">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <div class="kirtan-track-info">
+                <div class="kirtan-track-name">Maha-Mantra &amp; Campfire Japa</div>
+                <div class="kirtan-artist-name">DAM &amp; Trail Sangha</div>
+              </div>
+              <div class="kirtan-live-indicator" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="gallery-section" id="status">
+        <h2>Status</h2>
+        <p class="gallery-section-note">DAM Hikes has no separate 2150 South StatusStrip. Its live status is the floating map header shown here.</p>
+        <div class="gallery-status-preview">
+          <div class="floating-header">
+            <div class="brand-meta-group">
+              <div class="brand-title-row">
+                <h3 class="brand-title">DAM Hikes</h3>
+                <span class="brand-sub-badge">PCT SOBO</span>
+              </div>
+              <p class="trail-status-line">Eagle Creek Junction, OR<span class="trail-status-sub"> · mi 2142.0 · Day 2</span></p>
+              <p class="trail-mileage-counts">8.0 mi walked · 2142.0 to Campo</p>
+            </div>
+            <div class="header-actions-group">
+              <button type="button" class="btn-header-glass" aria-label="Browse timeline">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </button>
+              <button type="button" class="btn-header-primary" aria-label="New update">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <p class="gallery-footer">/components · shared checks · DAM Hikes live renderers</p>
+  </main>
+
+  <div id="photo-lightbox" class="lightbox-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen photo">
+    <button type="button" class="lightbox-close-btn" id="lightbox-close-btn" aria-label="Close photo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <img id="lightbox-img" class="lightbox-img-element" src="" alt="" />
   </div>
 
-  <!-- 1. Header Buttons -->
-  <section class="gallery-section">
-    <h2>Floating Header Actions</h2>
-    <div class="gallery-grid">
-      <div class="gallery-card">
-        <h3>Default / Glass / Primary</h3>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <button type="button" class="btn-header-glass" aria-label="Timeline">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </button>
-          <button type="button" class="btn-header-glass" aria-label="About">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </button>
-          <button type="button" class="btn-header-primary" aria-label="Compose">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="gallery-card">
-        <h3>Map Control Buttons</h3>
-        <div style="display:flex;flex-direction:column;gap:6px;width:fit-content;">
-          <button type="button" class="trail-map-btn" title="Focus current">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
-          </button>
-          <button type="button" class="trail-map-btn" title="Fit trail">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H8.5a4.5 4.5 0 0 1 0-9H18"/><circle cx="18" cy="5" r="3"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. DetailPanel variants -->
-  <section class="gallery-section">
-    <h2>DetailPanel · Card Types</h2>
-    <div class="gallery-grid">
-      <!-- Words -->
-      <div class="gallery-card">
-        <h3>type=words</h3>
-        <article class="trail-card-article type-words">
-          <div class="trail-card-content">
-            <p class="card-meta-stamp">Aug 14, 2026 · Cascade Locks, OR · mi 2150.0 · 180 ft</p>
-            <h2 class="card-heading">Bridge of the Gods: The Southbound Step</h2>
-            <div class="type-card-words-layout">
-              <div class="words-direct-statement">“Washington on one bank, Oregon on the other. Look down through the diamond steel grating and the river churns two hundred feet below.”</div>
-              <div class="trail-expanded-stats-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-                <div class="stats-badge-group">
-                  <span class="badge badge-category badge-cat-milestone">🏔️ Milestone / Pass</span>
-                  <span class="badge badge-section">Oregon</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Statistics -->
-      <div class="gallery-card">
-        <h3>type=statistics</h3>
-        <article class="trail-card-article type-statistics">
-          <div class="trail-card-content">
-            <p class="card-meta-stamp">Aug 20, 2026 · Timberline Lodge, OR · mi 2095.0 · 5950 ft</p>
-            <h2 class="card-heading">Timberline Lodge Resupply & Breakfast Push</h2>
-            <div class="type-card-stats-layout">
-              <div class="stats-four-grid">
-                <div class="stats-metric-cell"><span class="stat-label">Weather</span><span class="stat-main-val">52°F</span><span class="stat-sub-val">Clear Sky</span></div>
-                <div class="stats-metric-cell"><span class="stat-label">Water Source</span><span class="stat-main-val">Alpine Stream</span><span class="stat-sub-val">Reliable flow</span></div>
-                <div class="stats-metric-cell"><span class="stat-label">Pack Weight</span><span class="stat-main-val">26.5 lbs</span><span class="stat-sub-val">11.4 lb base</span></div>
-                <div class="stats-metric-cell"><span class="stat-label">Daily Mileage</span><span class="stat-main-val">24.5 mi</span><span class="stat-sub-val">6h 45m</span></div>
-              </div>
-              <div class="stats-splits-row">
-                <div class="split-cell"><span class="split-label">Elevation Ascent</span><span class="split-val split-up">+3,850 ft</span></div>
-                <div class="split-divider"></div>
-                <div class="split-cell"><span class="split-label">Elevation Descent</span><span class="split-val split-down">-2,150 ft</span></div>
-              </div>
-              <button type="button" class="card-read-more-btn">More details</button>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Voice -->
-      <div class="gallery-card">
-        <h3>type=voice</h3>
-        <article class="trail-card-article type-voice">
-          <div class="trail-card-content">
-            <p class="card-meta-stamp">Aug 19, 2026 · Timberline Trail, OR · mi 2098.5 · 6020 ft</p>
-            <h2 class="card-heading">Wind and Glacial Melt at Timberline Ridge</h2>
-            <div class="type-card-voice-layout">
-              <div class="voice-player-bar">
-                <button type="button" class="btn-audio-play-toggle" aria-label="Play">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </button>
-                <div class="waveform-container">
-                  <svg class="waveform-svg" viewBox="0 0 200 36" preserveAspectRatio="none"><path d="M4 18v-8M10 18v-12M16 18v-6M22 18v-14M28 18v-10M34 18v-16M40 18v-12M46 18v-6M52 18v-14M58 18v-10M64 18v-16M70 18v-12M76 18v-8M82 18v-14M88 18v-16M94 18v-10M100 18v-14M106 18v-8M112 18v-12M118 18v-16M124 18v-10M130 18v-14M136 18v-8M142 18v-12M148 18v-16M154 18v-10M160 18v-14M166 18v-8M172 18v-12M178 18v-6M184 18v-10M190 18v-4M196 18v-8" stroke="rgba(236, 231, 220, 0.28)" stroke-width="2.5" stroke-linecap="round"></path></svg>
-                </div>
-                <div class="audio-time-stamp"><span class="audio-current-time">0:00</span> / 02:44</div>
-              </div>
-              <div class="voice-transcript-box">
-                <span class="transcript-header-label">🎙️ Voice Dispatch Transcript</span>
-                <p class="transcript-prose">It's 6:15 in the evening... just crested the ridge above the Zigzag canyon.</p>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Scripture -->
-      <div class="gallery-card">
-        <h3>type=scripture</h3>
-        <article class="trail-card-article type-scripture">
-          <div class="trail-card-content">
-            <p class="card-meta-stamp">Aug 15, 2026 · Eagle Creek Junction, OR · mi 2142.0 · 1420 ft</p>
-            <h2 class="card-heading">Accepting One's Quota on the Trail</h2>
-            <div class="type-card-scripture-layout">
-              <div class="scripture-badge-row"><span class="scripture-citation-pill">📜 Śrī Īśopaniṣad Mantra 1</span></div>
-              <blockquote class="scripture-sanskrit-verse">īśāvāsyam idaṁ sarvaṁ yat kiñca jagatyāṁ jagat / tena tyaktena bhuñjīthā mā gṛdhaḥ kasya svid dhanam</blockquote>
-              <div class="scripture-translation-box">
-                <span class="translation-lead-word">Translation (Śrīla Prabhupāda):</span>
-                <p class="scripture-translation-prose">Everything animate or inanimate that is within the universe is controlled and owned by the Lord...</p>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. Badges -->
-  <section class="gallery-section">
-    <h2>Badges & Categories</h2>
-    <div class="gallery-card">
-      <div class="stats-badge-group" style="flex-wrap:wrap;gap:8px;">
-        <span class="badge badge-category badge-cat-campsite">⛺ Campsite</span>
-        <span class="badge badge-category badge-cat-milestone">🏔️ Milestone / Pass</span>
-        <span class="badge badge-category badge-cat-resupply">🍕 Resupply / Town</span>
-        <span class="badge badge-category badge-cat-wildlife">🐻 Wildlife & Flora</span>
-        <span class="badge badge-category badge-cat-hardship">⚡ Condition / Hazard</span>
-        <span class="badge badge-category badge-cat-reflection">📖 Journal Reflection</span>
-        <span class="badge badge-section">Oregon</span>
-        <span class="badge badge-section">Northern California</span>
-        <span class="badge badge-section">High Sierra</span>
-        <span class="badge badge-section">Southern California</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. Empty state -->
-  <section class="gallery-section">
-    <h2>Empty / No Results</h2>
-    <div class="gallery-card" style="max-width:420px;">
-      <article class="trail-card-article" style="padding:24px 16px;text-align:center;color:var(--color-muted);">
-        No updates found matching current filters.
-      </article>
-    </div>
-  </section>
-
-  <p style="color:var(--color-subtle);font-size:0.8rem;margin-top:40px;">
-    Open via any static server. For full interactive Storybook later: add Node + @storybook/html.
-  </p>
+  <script type="module" src="js/components-gallery.js?v=7"></script>
 </body>
 </html>
