@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAM Hikes · Component Gallery</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Gallery-specific overrides */
+    body {
+      overflow: auto !important;
+      height: auto !important;
+      padding: 24px;
+      background: #0d0e0c;
+    }
+    .gallery-header {
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 16px;
+    }
+    .gallery-header h1 {
+      font-size: 1.75rem;
+      margin-bottom: 4px;
+    }
+    .gallery-header p {
+      color: var(--color-muted);
+      font-size: 0.9rem;
+    }
+    .gallery-section {
+      margin-bottom: 48px;
+    }
+    .gallery-section h2 {
+      font-size: 1.1rem;
+      color: var(--color-primary);
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .gallery-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      overflow: hidden;
+    }
+    .gallery-card h3 {
+      font-size: 0.85rem;
+      color: var(--color-muted);
+      margin-bottom: 12px;
+      font-family: var(--font-mono);
+    }
+    .gallery-note {
+      font-size: 0.75rem;
+      color: var(--color-subtle);
+      margin-top: 8px;
+    }
+    /* Isolate some components */
+    .iso-header { position: relative; height: 80px; }
+    .iso-dock { position: relative; max-width: 420px; }
+    .iso-sheet { position: relative; max-width: 480px; height: 360px; overflow: auto; border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+  </style>
+</head>
+<body>
+  <div class="gallery-header">
+    <h1>DAM Hikes Component Gallery</h1>
+    <p>All major UI components & states for detail work and consistency. Static visual catalog (not interactive Storybook).</p>
+  </div>
+
+  <!-- 1. Header Buttons -->
+  <section class="gallery-section">
+    <h2>Floating Header Actions</h2>
+    <div class="gallery-grid">
+      <div class="gallery-card">
+        <h3>Default / Glass / Primary</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="btn-header-glass" aria-label="Timeline">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+          <button type="button" class="btn-header-glass" aria-label="About">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+          <button type="button" class="btn-header-primary" aria-label="Compose">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <h3>Map Control Buttons</h3>
+        <div style="display:flex;flex-direction:column;gap:6px;width:fit-content;">
+          <button type="button" class="trail-map-btn" title="Focus current">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+          </button>
+          <button type="button" class="trail-map-btn" title="Fit trail">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H8.5a4.5 4.5 0 0 1 0-9H18"/><circle cx="18" cy="5" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. DetailPanel variants -->
+  <section class="gallery-section">
+    <h2>DetailPanel · Card Types</h2>
+    <div class="gallery-grid">
+      <!-- Words -->
+      <div class="gallery-card">
+        <h3>type=words</h3>
+        <article class="trail-card-article type-words">
+          <div class="trail-card-content">
+            <p class="card-meta-stamp">Aug 14, 2026 · Cascade Locks, OR · mi 2150.0 · 180 ft</p>
+            <h2 class="card-heading">Bridge of the Gods: The Southbound Step</h2>
+            <div class="type-card-words-layout">
+              <div class="words-direct-statement">“Washington on one bank, Oregon on the other. Look down through the diamond steel grating and the river churns two hundred feet below.”</div>
+              <div class="trail-expanded-stats-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+                <div class="stats-badge-group">
+                  <span class="badge badge-category badge-cat-milestone">🏔️ Milestone / Pass</span>
+                  <span class="badge badge-section">Oregon</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Statistics -->
+      <div class="gallery-card">
+        <h3>type=statistics</h3>
+        <article class="trail-card-article type-statistics">
+          <div class="trail-card-content">
+            <p class="card-meta-stamp">Aug 20, 2026 · Timberline Lodge, OR · mi 2095.0 · 5950 ft</p>
+            <h2 class="card-heading">Timberline Lodge Resupply & Breakfast Push</h2>
+            <div class="type-card-stats-layout">
+              <div class="stats-four-grid">
+                <div class="stats-metric-cell"><span class="stat-label">Weather</span><span class="stat-main-val">52°F</span><span class="stat-sub-val">Clear Sky</span></div>
+                <div class="stats-metric-cell"><span class="stat-label">Water Source</span><span class="stat-main-val">Alpine Stream</span><span class="stat-sub-val">Reliable flow</span></div>
+                <div class="stats-metric-cell"><span class="stat-label">Pack Weight</span><span class="stat-main-val">26.5 lbs</span><span class="stat-sub-val">11.4 lb base</span></div>
+                <div class="stats-metric-cell"><span class="stat-label">Daily Mileage</span><span class="stat-main-val">24.5 mi</span><span class="stat-sub-val">6h 45m</span></div>
+              </div>
+              <div class="stats-splits-row">
+                <div class="split-cell"><span class="split-label">Elevation Ascent</span><span class="split-val split-up">+3,850 ft</span></div>
+                <div class="split-divider"></div>
+                <div class="split-cell"><span class="split-label">Elevation Descent</span><span class="split-val split-down">-2,150 ft</span></div>
+              </div>
+              <button type="button" class="card-read-more-btn">More details</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Voice -->
+      <div class="gallery-card">
+        <h3>type=voice</h3>
+        <article class="trail-card-article type-voice">
+          <div class="trail-card-content">
+            <p class="card-meta-stamp">Aug 19, 2026 · Timberline Trail, OR · mi 2098.5 · 6020 ft</p>
+            <h2 class="card-heading">Wind and Glacial Melt at Timberline Ridge</h2>
+            <div class="type-card-voice-layout">
+              <div class="voice-player-bar">
+                <button type="button" class="btn-audio-play-toggle" aria-label="Play">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </button>
+                <div class="waveform-container">
+                  <svg class="waveform-svg" viewBox="0 0 200 36" preserveAspectRatio="none"><path d="M4 18v-8M10 18v-12M16 18v-6M22 18v-14M28 18v-10M34 18v-16M40 18v-12M46 18v-6M52 18v-14M58 18v-10M64 18v-16M70 18v-12M76 18v-8M82 18v-14M88 18v-16M94 18v-10M100 18v-14M106 18v-8M112 18v-12M118 18v-16M124 18v-10M130 18v-14M136 18v-8M142 18v-12M148 18v-16M154 18v-10M160 18v-14M166 18v-8M172 18v-12M178 18v-6M184 18v-10M190 18v-4M196 18v-8" stroke="rgba(236, 231, 220, 0.28)" stroke-width="2.5" stroke-linecap="round"></path></svg>
+                </div>
+                <div class="audio-time-stamp"><span class="audio-current-time">0:00</span> / 02:44</div>
+              </div>
+              <div class="voice-transcript-box">
+                <span class="transcript-header-label">🎙️ Voice Dispatch Transcript</span>
+                <p class="transcript-prose">It's 6:15 in the evening... just crested the ridge above the Zigzag canyon.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Scripture -->
+      <div class="gallery-card">
+        <h3>type=scripture</h3>
+        <article class="trail-card-article type-scripture">
+          <div class="trail-card-content">
+            <p class="card-meta-stamp">Aug 15, 2026 · Eagle Creek Junction, OR · mi 2142.0 · 1420 ft</p>
+            <h2 class="card-heading">Accepting One's Quota on the Trail</h2>
+            <div class="type-card-scripture-layout">
+              <div class="scripture-badge-row"><span class="scripture-citation-pill">📜 Śrī Īśopaniṣad Mantra 1</span></div>
+              <blockquote class="scripture-sanskrit-verse">īśāvāsyam idaṁ sarvaṁ yat kiñca jagatyāṁ jagat / tena tyaktena bhuñjīthā mā gṛdhaḥ kasya svid dhanam</blockquote>
+              <div class="scripture-translation-box">
+                <span class="translation-lead-word">Translation (Śrīla Prabhupāda):</span>
+                <p class="scripture-translation-prose">Everything animate or inanimate that is within the universe is controlled and owned by the Lord...</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Badges -->
+  <section class="gallery-section">
+    <h2>Badges & Categories</h2>
+    <div class="gallery-card">
+      <div class="stats-badge-group" style="flex-wrap:wrap;gap:8px;">
+        <span class="badge badge-category badge-cat-campsite">⛺ Campsite</span>
+        <span class="badge badge-category badge-cat-milestone">🏔️ Milestone / Pass</span>
+        <span class="badge badge-category badge-cat-resupply">🍕 Resupply / Town</span>
+        <span class="badge badge-category badge-cat-wildlife">🐻 Wildlife & Flora</span>
+        <span class="badge badge-category badge-cat-hardship">⚡ Condition / Hazard</span>
+        <span class="badge badge-category badge-cat-reflection">📖 Journal Reflection</span>
+        <span class="badge badge-section">Oregon</span>
+        <span class="badge badge-section">Northern California</span>
+        <span class="badge badge-section">High Sierra</span>
+        <span class="badge badge-section">Southern California</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Empty state -->
+  <section class="gallery-section">
+    <h2>Empty / No Results</h2>
+    <div class="gallery-card" style="max-width:420px;">
+      <article class="trail-card-article" style="padding:24px 16px;text-align:center;color:var(--color-muted);">
+        No updates found matching current filters.
+      </article>
+    </div>
+  </section>
+
+  <p style="color:var(--color-subtle);font-size:0.8rem;margin-top:40px;">
+    Open via any static server. For full interactive Storybook later: add Node + @storybook/html.
+  </p>
+</body>
+</html>
