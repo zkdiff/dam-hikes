@@ -192,31 +192,31 @@ export class ElevationProfile {
     svg.addEventListener('mousemove', (e) => {
       this.hoverMile = getMileFromEvent(e);
       this.render();
-      store.setScrub(this.hoverMile);
+      store.setScrubMile(this.hoverMile);
     });
 
     svg.addEventListener('mouseleave', () => {
       this.hoverMile = null;
       this.render();
-      store.setScrub(null);
+      store.setScrubMile(null);
     });
 
     svg.addEventListener('touchstart', (e) => {
       this.hoverMile = getMileFromEvent(e);
       this.render();
-      store.setScrub(this.hoverMile);
+      store.setScrubMile(this.hoverMile);
     }, { passive: true });
 
     svg.addEventListener('touchmove', (e) => {
       this.hoverMile = getMileFromEvent(e);
       this.render();
-      store.setScrub(this.hoverMile);
+      store.setScrubMile(this.hoverMile);
     }, { passive: true });
 
     svg.addEventListener('touchend', () => {
       this.hoverMile = null;
       this.render();
-      store.setScrub(null);
+      store.setScrubMile(null);
     });
 
     svg.addEventListener('click', (e) => {
